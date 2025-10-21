@@ -1,0 +1,32 @@
+# --- Node.js / Angular ---
+
+# Compiled output
+/dist
+/coverage
+/tmp
+/out-tsc
+/bazel-out
+
+# Dependencies
+/node_modules
+
+# Angular cache
+/.angular/cache
+/.sass-cache
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+*.log
+libpeerconnection.log
+testem.log
+
+# Environment files
+.env
+.env.local
+.env.*.local
+
+# Misc
+connect.lock
+typings/
