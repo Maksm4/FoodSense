@@ -1,0 +1,19 @@
+using System.Numerics;
+
+namespace Inventory.API.Models
+{
+    public class Product
+    {
+        public BigInteger Id { get; set; }
+        public string Name { get; set; } = string.Empty;
+        public string Brand { get; set; } = string.Empty;
+        public string BarCode { get; set; } = string.Empty;
+        public string Description { get; set; } = string.Empty;
+        public BigInteger CategoryId { get; set; }
+        public Category Category { get; set; }
+        //could be a photo url or base64 string
+        public ProductScope Scope { get; set; } = ProductScope.Private;
+        public IEnumerable<ProductItem> ProductItems { get; set;  } = [];
+        public Unit DefaultUnit { get; set; }
+    }
+}
