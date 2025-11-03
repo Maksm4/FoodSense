@@ -4,9 +4,10 @@ namespace Inventory.API.Models
 {
     public class UserKitchen
     {
-        public BigInteger Id { get; set; }
-        public BigInteger UserId { get; set; }
-        public BigInteger KitchenId { get; set; }
+        public Guid Id { get; set; }
+        public string Role { get; set; } = string.Empty;
+        public string UserId { get; set; } = string.Empty;
+        public Guid KitchenId { get; set; }
         public Kitchen Kitchen { get; set; }
     }
 }

@@ -4,12 +4,12 @@ using Inventory.API.Models;
 
 namespace Inventory.API.Data.Repository
 {
-    public class ProductRepository : GenericRepository<Product>, IProductRepository
+    public class ProductItemRepository : GenericRepository<ProductItem>, IProductItemRepository
     {
         private readonly InventoryDbContext _context;
-        public ProductRepository(InventoryDbContext context) : base(context)
+        public ProductItemRepository(InventoryDbContext context) : base(context)
         {
-            _context = context;
+            _context = context; 
         }
 
 

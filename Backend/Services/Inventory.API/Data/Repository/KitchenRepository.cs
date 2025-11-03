@@ -1,36 +1,19 @@
-﻿using Inventory.API.Data.Interfaces;
+﻿using Inventory.API.Data.Context;
+using Inventory.API.Data.Interfaces;
 using Inventory.API.Models;
 
 namespace Inventory.API.Data.Repository
 {
-    public class KitchenRepository : IKitchenRepository
+    public class KitchenRepository : GenericRepository<Kitchen>, IKitchenRepository
     {
-        public Task Add(Kitchen entity)
+        private readonly InventoryDbContext _context;
+
+        public KitchenRepository(InventoryDbContext context) : base(context)
         {
-            throw new NotImplementedException();
+            _context = context;
         }
 
-        public void Delete(Kitchen entity)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<IEnumerable<Kitchen>> GetAll()
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task<Kitchen?> GetById(int id)
-        {
-            throw new NotImplementedException();
-        }
-
-        public Task SaveChanges()
-        {
-            throw new NotImplementedException();
-        }
-
-        public void Update(Kitchen entity)
+        public Task<IEnumerable<ProductItem>> GetAllProductItems(int kitchenId)
         {
             throw new NotImplementedException();
         }

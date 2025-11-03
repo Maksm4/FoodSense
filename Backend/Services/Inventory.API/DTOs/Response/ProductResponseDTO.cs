@@ -1,8 +1,8 @@
-using System.Numerics;
+﻿using Inventory.API.Models;
 
-namespace Inventory.API.Models
+namespace Inventory.API.DTOs.Response
 {
-    public class Product
+    public class ProductResponseDTO
     {
         public Guid Id { get; set; }
         public string Name { get; set; } = string.Empty;
@@ -10,10 +10,7 @@ namespace Inventory.API.Models
         public string BarCode { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
         public Guid CategoryId { get; set; }
-        public Category Category { get; set; }
-        //could be a photo url or base64 string
-        public ProductScope Scope { get; set; } = ProductScope.Private;
-        public IEnumerable<ProductItem> ProductItems { get; set;  } = [];
+        public string CategoryName { get; set; } = string.Empty;
         public Unit DefaultUnit { get; set; }
     }
 }

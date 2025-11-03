@@ -2,7 +2,7 @@
 
 namespace Inventory.API.Data.Interfaces
 {
-    public interface IKitchenRepository
+    public interface IKitchenRepository : IGenericRepository<Kitchen>
     {
         Task<IEnumerable<ProductItem>> GetAllProductItems(int kitchenId);
     }

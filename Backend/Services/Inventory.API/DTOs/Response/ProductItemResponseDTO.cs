@@ -1,20 +1,20 @@
-﻿using System.Numerics;
+﻿using Inventory.API.Models;
 
-namespace Inventory.API.Models
+namespace Inventory.API.DTOs.Response
 {
-    public class ProductItem
+    public class ProductItemResponseDTO
     {
         public Guid Id { get; set; }
         public int Quantity { get; set; }
         public Guid ProductId { get; set; }
-        public Product Product { get; set; }
+        public string ProductName { get; set; } = string.Empty;
         public double Price { get; set; }
         public DateOnly PurchaseDate { get; set; }
         public DateOnly ExpirationDate { get; set; }
         public Unit Unit { get; set; }
-        public string AddedBy { get; set; } = string.Empty;
+        public Guid AddedBy { get; set; }
         public DateTime AddedDate { get; set; }
         public Guid KitchenId { get; set; }
-        public Kitchen Kitchen { get; set; }
+        public string KitchenName { get; set; } = string.Empty;
     }
 }
