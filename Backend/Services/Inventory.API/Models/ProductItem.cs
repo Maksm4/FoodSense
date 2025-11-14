@@ -4,7 +4,7 @@ namespace Inventory.API.Models
 {
     public class ProductItem
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; } =  Guid.NewGuid();
         public int Quantity { get; set; }
         public Guid ProductId { get; set; }
         public Product Product { get; set; }

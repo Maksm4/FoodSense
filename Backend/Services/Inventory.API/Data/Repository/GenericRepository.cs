@@ -30,7 +30,7 @@ namespace Inventory.API.Data.Repository
             return await _dbSet.ToListAsync();
         }
 
-        public async Task<T?> GetById(int id)
+        public async Task<T?> GetById(Guid id)
         {
             return await _dbSet.FindAsync(id);
         }

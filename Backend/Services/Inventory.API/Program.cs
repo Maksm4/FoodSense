@@ -16,7 +16,6 @@ builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(KitchenProfile));
 
-
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

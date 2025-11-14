@@ -34,7 +34,7 @@ namespace Inventory.API.Services
 
             kitchenEntity.UserKitchens.Append(new UserKitchen
             {
-                UserId = Guid.Parse(userId),
+                UserId = userId,
                 Role = "Owner",
                 Kitchen = kitchenEntity,
                 KitchenId = kitchenEntity.Id
@@ -47,19 +47,46 @@ namespace Inventory.API.Services
             return _mapper.Map<KitchenResponseDTO>(kitchenEntity);
         }
 
-        public Task<bool> DeleteKitchen(int kitchenId)
+        public async Task<bool> DeleteKitchen(Guid kitchenId)
         {
-            throw new NotImplementedException();
+            var kitchenToDelete = await _kitchenRepository.GetById(kitchenId);
+
+            if (kitchenToDelete == null)
+            {
+                return false;
+            }
+            
+            _kitchenRepository.Delete(kitchenToDelete);
+            await _kitchenRepository.SaveChanges();
+            
+            return true;
         }
 
-        public Task<KitchenResponseDTO?> GetKitchen(int kitchenId, string userId)
+        public async Task<KitchenResponseDTO?> GetKitchen(Guid? kitchenId, string? userId)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentNullException(nameof(userId), "User ID is required");
+            }
+
+            if (kitchenId == null)
+            {
+                throw new ArgumentNullException(nameof(kitchenId), "Kitchen ID is required");
+            }
+            
+            var kitchen = await _kitchenRepository.GetById(kitchenId.Value);
+            return  _mapper.Map<KitchenResponseDTO>(kitchen);
         }
 
-        public Task<IEnumerable<KitchenResponseDTO>> GetUserKitchens(string userId)
+        public async Task<IEnumerable<KitchenResponseDTO>> GetKitchens(string userId)
         {
-            throw new NotImplementedException();
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentNullException(nameof(userId), "User ID is required");
+            }
+
+            var kitchens = await _kitchenRepository.GetAll(userId);
+            return _mapper.Map<IEnumerable<KitchenResponseDTO>>(kitchens);
         }
     }
 }

@@ -13,7 +13,12 @@ namespace Inventory.API.Data.Repository
             _context = context;
         }
 
-        public Task<IEnumerable<ProductItem>> GetAllProductItems(int kitchenId)
+        public Task<IEnumerable<ProductItem>> GetAllProductItems(Guid kitchenId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task<IEnumerable<Kitchen>> GetAll(string userId)
         {
             throw new NotImplementedException();
         }

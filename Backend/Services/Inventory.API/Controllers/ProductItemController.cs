@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.API.Controllers
 {
-    [Route("api/kitchens/{kitchenId:int}/items")]
+    [Route("api/kitchens/{kitchenId:guid}/items")]
     [ApiController]
     [Authorize]
     public class ProductItemController : ControllerBase

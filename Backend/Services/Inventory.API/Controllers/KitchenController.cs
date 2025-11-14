@@ -24,25 +24,20 @@ namespace Inventory.API.Controllers
             return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "testing-userId";
         }
 
-        [HttpGet("{kitchenId:int}")]
+        [HttpGet("{kitchenId:guid}")]
         [ProducesResponseType(typeof(KitchenResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> GetKitchenById([FromRoute] int kitchenId)
+        public async Task<IActionResult> GetKitchen([FromRoute] Guid kitchenId)
         {
-            if (kitchenId < 0)
-            {
-                return BadRequest("Invalid kitchen ID.");
-            }
-
             var userId = GetCurrentUserId();
-            var kitchenDTO = await _kitchenService.GetKitchen(kitchenId, userId);
-            if (kitchenDTO == null)
+            var kitchenDto = await _kitchenService.GetKitchen(kitchenId, userId);
+            if (kitchenDto == null)
             {
                 return NotFound();
             }
 
-            return Ok(kitchenDTO);
+            return Ok(kitchenDto);
         }
 
         
@@ -51,15 +46,15 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> GetKitchens()
         {
             var userId = GetCurrentUserId();
-            var kitchensDTO = await _kitchenService.GetUserKitchens(userId);
+            var kitchensDto = await _kitchenService.GetKitchens(userId);
 
-            return Ok(kitchensDTO);
+            return Ok(kitchensDto);
         }
 
         [HttpPost]
         [ProducesResponseType(typeof(KitchenResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateKitchen([FromBody] CreateKitchenDTO createKitchenDto)
+        public async Task<IActionResult> CreateKitchen([FromBody] CreateKitchenDTO? createKitchenDto)
         {
             if(createKitchenDto == null)
             {
@@ -67,15 +62,15 @@ namespace Inventory.API.Controllers
             }
 
             var userId = GetCurrentUserId();
-            var createdKitchenDTO = await _kitchenService.CreateKitchen(createKitchenDto, userId);
+            var createdKitchenDto = await _kitchenService.CreateKitchen(createKitchenDto, userId);
 
-            return CreatedAtAction(nameof(GetKitchenById), new { kitchenId = createdKitchenDTO.Id }, createdKitchenDTO);
+            return CreatedAtAction(nameof(GetKitchen), new { kitchenId = createdKitchenDto.Id }, createdKitchenDto);
         }
 
-        [HttpDelete("{kitchenId:int}")]
+        [HttpDelete("{kitchenId:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteKitchen([FromRoute] int kitchenId)
+        public async Task<IActionResult> DeleteKitchen([FromRoute] Guid kitchenId)
         {
             var deleted = await _kitchenService.DeleteKitchen(kitchenId);
             if (!deleted)
@@ -85,4 +80,6 @@ namespace Inventory.API.Controllers
             return NoContent();
         }
     }
+    
+    // add option for inviting other users to kitchen
 }

@@ -4,7 +4,7 @@ namespace Inventory.API.Models
 {
     public class Kitchen
     {
-        public Guid Id { get; set; }
+        public Guid Id { get; } =  Guid.NewGuid();
         public string Name { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public IEnumerable<ProductItem> ProductItems { get; set; } = [];
@@ -12,7 +12,6 @@ namespace Inventory.API.Models
 
         public Kitchen()
         {
-            Id = Guid.NewGuid();
             CreatedDate = DateTime.UtcNow;
         }
     }
