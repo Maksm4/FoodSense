@@ -73,6 +73,5 @@ namespace Inventory.API.Controllers
 
             return NoContent();
         }
-
     }
 }

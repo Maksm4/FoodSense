@@ -41,6 +41,7 @@ namespace Inventory.API.Controllers
         }
 
         
+        //get all kitchens for CURRENT user
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<KitchenResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetKitchens()
@@ -67,6 +68,7 @@ namespace Inventory.API.Controllers
             return CreatedAtAction(nameof(GetKitchen), new { kitchenId = createdKitchenDto.Id }, createdKitchenDto);
         }
 
+        //only the owner can delete the kitchen
         [HttpDelete("{kitchenId:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]

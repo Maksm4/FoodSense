@@ -11,7 +11,7 @@ namespace Inventory.API.Models
         public string Description { get; set; } = string.Empty;
         public Guid CategoryId { get; set; }
         public Category Category { get; set; }
-        //could be a photo url or base64 string
+        //public string VisualRepresentation base64 ?
         public ProductScope Scope { get; set; } = ProductScope.Private;
         public IEnumerable<ProductItem> ProductItems { get; set;  } = [];
         public Unit DefaultUnit { get; set; }

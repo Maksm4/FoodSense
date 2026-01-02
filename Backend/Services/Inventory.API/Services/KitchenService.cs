@@ -35,7 +35,7 @@ namespace Inventory.API.Services
             kitchenEntity.UserKitchens.Append(new UserKitchen
             {
                 UserId = userId,
-                Role = "Owner",
+                Role = UserKitchenRole.Owner,
                 Kitchen = kitchenEntity,
                 KitchenId = kitchenEntity.Id
             });
