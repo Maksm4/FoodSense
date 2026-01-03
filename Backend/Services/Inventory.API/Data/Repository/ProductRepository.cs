@@ -11,7 +11,10 @@ namespace Inventory.API.Data.Repository
         {
             _context = context;
         }
-
-
+        
+        public Task<Product> GetProductsByName(string search, int limit)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

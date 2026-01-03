@@ -27,8 +27,6 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<ProductResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProducts([FromQuery] string? search, [FromQuery] int limit = 10)
         {
-            if (limit > 20) limit = 20;
-            
             var products = await _productService.GetProducts(search, limit);
             return Ok(products);
         }
@@ -64,13 +62,7 @@ namespace Inventory.API.Controllers
 
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid productId)
         {
-            var success = await _productService.DeleteProduct(productId);
-
-            if (!success)
-            {
-                return NotFound();
-            }
-
+            await _productService.DeleteProduct(productId);
             return NoContent();
         }
         
@@ -91,7 +83,5 @@ namespace Inventory.API.Controllers
             }
             return NoContent();
         }
-        
-        
     }
 }

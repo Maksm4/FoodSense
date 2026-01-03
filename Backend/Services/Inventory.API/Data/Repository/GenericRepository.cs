@@ -7,7 +7,7 @@ namespace Inventory.API.Data.Repository
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
         private readonly InventoryDbContext _context;
-        private DbSet<T> _dbSet;
+        private readonly DbSet<T> _dbSet;
 
         public GenericRepository(InventoryDbContext context)
         {

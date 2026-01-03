@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
+using Common.Exceptions;
 using Inventory.API.Data.Interfaces;
 using Inventory.API.DTOs.Request;
 using Inventory.API.DTOs.Response;
+using Inventory.API.Models;
 using Inventory.API.Services.Interfaces;
 
 namespace Inventory.API.Services
@@ -16,37 +18,51 @@ namespace Inventory.API.Services
             _productRepository = kitchenRepository;
             _mapper = mapper;
         }
-        
+
         public async Task<IEnumerable<ProductResponseDTO>> GetProducts(string? search, int limit = 10)
         {
-            if (string.IsNullOrEmpty(search))
+            if (string.IsNullOrWhiteSpace(search))
             {
-                search = "";
+                return Enumerable.Empty<ProductResponseDTO>();
             }
             
-            var matchingProducts = await _productRepository.GetProductsByName(search, limit);
-            
-            if (matchingProducts == null || !matchingProducts.Any())
+            if (limit > 20) limit = 20;
+
+            var products = await _productRepository.GetProductsByName(search, limit);
+            return _mapper.Map<IEnumerable<ProductResponseDTO>>(products);
+        }
+
+        public async Task<ProductResponseDTO?> GetProductById(Guid productId)
+        {
+            if (productId == Guid.Empty)
             {
-                return _mapper.Map<IEnumerable<ProductResponseDTO>>(Enumerable.Empty<ProductResponseDTO>());
+                throw new ArgumentException("Product ID cannot be empty", nameof(productId));
             }
-
-            return _mapper.Map<IEnumerable<ProductResponseDTO>>(matchingProducts);
+            
+            Product? product =  await _productRepository.GetById(productId);
+            return product == null ? null : _mapper.Map<ProductResponseDTO>(product);
         }
 
-        public Task<ProductResponseDTO?> GetProductById(Guid productId)
+        public async Task<ProductResponseDTO> CreateProduct(CreateProductRequestDTO? productDto, string userId)
         {
-            throw new NotImplementedException();
+            var productEntity = _mapper.Map<Product>(productDto);
+            
+            await _productRepository.Add(productEntity);
+            await _productRepository.SaveChanges();
+
+            return _mapper.Map<ProductResponseDTO>(productEntity);
         }
 
-        public Task<ProductResponseDTO> CreateProduct(CreateProductRequestDTO productDto, string userId)
+        public async Task DeleteProduct(Guid productId)
         {
-            throw new NotImplementedException();
-        }
+            Product? product = await _productRepository.GetById(productId);
 
-        public Task<bool> DeleteProduct(Guid productId)
-        {
-            throw new NotImplementedException();
+            if (product == null)
+            {
+                throw new NotFoundException("Product not found");
+            }
+            _productRepository.Delete(product);
+            await _productRepository.SaveChanges();
         }
     }
 }

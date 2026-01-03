@@ -11,12 +11,12 @@ namespace Inventory.API.Services
             throw new NotImplementedException();
         }
 
-        public Task<bool> DeleteProduct(Guid productId)
+        public Task DeleteProduct(Guid productId)
         {
             throw new NotImplementedException();
         }
 
-        public Task<IEnumerable<ProductResponseDTO>> GetAllProducts()
+        public Task<IEnumerable<ProductResponseDTO>> GetProducts(string? search, int limit = 10)
         {
             throw new NotImplementedException();
         }

@@ -7,7 +7,7 @@ namespace Inventory.API.Services.Interfaces
     {
         Task<IEnumerable<ProductResponseDTO>> GetProducts(string? search, int limit = 10);
         Task<ProductResponseDTO?> GetProductById(Guid productId);
-        Task<ProductResponseDTO> CreateProduct(CreateProductRequestDTO productDto, string userId);
-        Task<bool> DeleteProduct(Guid productId);
+        Task<ProductResponseDTO> CreateProduct(CreateProductRequestDTO? productDto, string userId);
+        Task DeleteProduct(Guid productId);
     }
 }
