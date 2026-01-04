@@ -2,7 +2,7 @@
 
 namespace Inventory.API.DTOs.Request
 {
-    public class CreateProductItemDTO
+    public class CreateProductItemDto
     {
         public int Quantity { get; set; }
         public Guid ProductId { get; set; }

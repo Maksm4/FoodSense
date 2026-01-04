@@ -55,7 +55,7 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(typeof(ProductItemResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> CreateProductItem(Guid kitchenId, [FromBody] CreateProductItemDTO itemDTO)
+        public async Task<IActionResult> CreateProductItem(Guid kitchenId, [FromBody] CreateProductItemDto itemDTO)
         {
             var createdItem = await _productItemService.AddItemToKitchen(kitchenId, itemDTO);
             return CreatedAtAction(nameof(GetProductItems), new { kitchenId = kitchenId }, createdItem);

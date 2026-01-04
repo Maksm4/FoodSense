@@ -1,6 +1,6 @@
 ﻿namespace Inventory.API.DTOs.Request
 {
-    public class CreateKitchenDTO
+    public class CreateKitchenDto
     {
         public string Name { get; set; } = string.Empty;
     }

@@ -2,10 +2,10 @@
 
 namespace Inventory.API.DTOs.Request
 {
-    public class CreateProductRequestDTO
+    public class CreateProductRequestDto
     {
         [Required]
-        public string Name { get; set; }
+        public string Name { get; set; } = string.Empty;
         public string? Brand { get; set; }
         public string? Barcode { get; set; } // needed for public approval
 

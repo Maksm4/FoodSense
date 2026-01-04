@@ -6,12 +6,22 @@ namespace Inventory.API.Services
 {
     public class ProductItemService : IProductService
     {
-        public Task<ProductResponseDTO> CreateProduct(CreateProductRequestDTO productDto, string userId)
+        public Task<ProductResponseDTO> CreateProduct(CreateProductRequestDto? productDto, string userId)
         {
             throw new NotImplementedException();
         }
 
         public Task DeleteProduct(Guid productId)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ChangeProductScope(ChangeProductScopeDto changeProductScopeDto)
+        {
+            throw new NotImplementedException();
+        }
+
+        public Task ChangeProductScope(Guid productId, ChangeProductScopeDto changeProductScopeDto)
         {
             throw new NotImplementedException();
         }

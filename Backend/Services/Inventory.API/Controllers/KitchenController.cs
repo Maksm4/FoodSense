@@ -55,7 +55,7 @@ namespace Inventory.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(KitchenResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateKitchen([FromBody] CreateKitchenDTO? createKitchenDto)
+        public async Task<IActionResult> CreateKitchen([FromBody] CreateKitchenDto? createKitchenDto)
         {
             if(createKitchenDto == null)
             {

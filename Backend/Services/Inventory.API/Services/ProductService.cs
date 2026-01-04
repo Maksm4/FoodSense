@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using System.Runtime.InteropServices.ComTypes;
+using AutoMapper;
 using Common.Exceptions;
 using Inventory.API.Data.Interfaces;
 using Inventory.API.DTOs.Request;
@@ -8,17 +9,8 @@ using Inventory.API.Services.Interfaces;
 
 namespace Inventory.API.Services
 {
-    public class ProductService : IProductService
+    public class ProductService(IProductRepository kitchenRepository, IMapper mapper) : IProductService
     {
-        private readonly IProductRepository _productRepository;
-        private readonly IMapper _mapper;
-        
-        public ProductService(IProductRepository kitchenRepository, IMapper mapper)
-        {
-            _productRepository = kitchenRepository;
-            _mapper = mapper;
-        }
-
         public async Task<IEnumerable<ProductResponseDTO>> GetProducts(string? search, int limit = 10)
         {
             if (string.IsNullOrWhiteSpace(search))
@@ -28,8 +20,8 @@ namespace Inventory.API.Services
             
             if (limit > 20) limit = 20;
 
-            var products = await _productRepository.GetProductsByName(search, limit);
-            return _mapper.Map<IEnumerable<ProductResponseDTO>>(products);
+            var products = await kitchenRepository.GetProductsByName(search, limit);
+            return mapper.Map<IEnumerable<ProductResponseDTO>>(products);
         }
 
         public async Task<ProductResponseDTO?> GetProductById(Guid productId)
@@ -39,30 +31,42 @@ namespace Inventory.API.Services
                 throw new ArgumentException("Product ID cannot be empty", nameof(productId));
             }
             
-            Product? product =  await _productRepository.GetById(productId);
-            return product == null ? null : _mapper.Map<ProductResponseDTO>(product);
+            Product? product =  await kitchenRepository.GetById(productId);
+            return product == null ? null : mapper.Map<ProductResponseDTO>(product);
         }
 
-        public async Task<ProductResponseDTO> CreateProduct(CreateProductRequestDTO? productDto, string userId)
+        public async Task<ProductResponseDTO> CreateProduct(CreateProductRequestDto? productDto, string userId)
         {
-            var productEntity = _mapper.Map<Product>(productDto);
+            var productEntity = mapper.Map<Product>(productDto);
             
-            await _productRepository.Add(productEntity);
-            await _productRepository.SaveChanges();
+            await kitchenRepository.Add(productEntity);
+            await kitchenRepository.SaveChanges();
 
-            return _mapper.Map<ProductResponseDTO>(productEntity);
+            return mapper.Map<ProductResponseDTO>(productEntity);
         }
 
         public async Task DeleteProduct(Guid productId)
         {
-            Product? product = await _productRepository.GetById(productId);
+            Product? product = await kitchenRepository.GetById(productId);
 
             if (product == null)
             {
                 throw new NotFoundException("Product not found");
             }
-            _productRepository.Delete(product);
-            await _productRepository.SaveChanges();
+            kitchenRepository.Delete(product);
+            await kitchenRepository.SaveChanges();
+        }
+
+        public async Task ChangeProductScope(ChangeProductScopeDto changeProductScopeDto)
+        {
+            Product? product = await kitchenRepository.GetById(changeProductScopeDto.ProductId);
+            if (product == null)
+            {
+                throw new NotFoundException("Product not found");
+            }
+            
+            product.Scope = changeProductScopeDto.NewScope; 
+            await kitchenRepository.SaveChanges();   
         }
     }
 }

@@ -8,17 +8,9 @@ using Inventory.API.Services.Interfaces;
 
 namespace Inventory.API.Services
 {
-    public class KitchenService : IKitchenService
+    public class KitchenService(IKitchenRepository kitchenRepository, IMapper mapper) : IKitchenService
     {
-        private readonly IKitchenRepository _kitchenRepository;
-        private readonly IMapper _mapper;
-        public KitchenService(IKitchenRepository kitchenRepository, IMapper mapper)
-        {
-            _kitchenRepository = kitchenRepository;
-            _mapper = mapper;
-        }
-
-        public async Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDTO kitchenDTO, string userId)
+        public async Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDto kitchenDTO, string userId)
         {
             if (kitchenDTO == null)
             {
@@ -30,7 +22,7 @@ namespace Inventory.API.Services
                 throw new ArgumentNullException(nameof(userId), "User ID is required");
             }
 
-            var kitchenEntity = _mapper.Map<Kitchen>(kitchenDTO);
+            var kitchenEntity = mapper.Map<Kitchen>(kitchenDTO);
 
             kitchenEntity.UserKitchens.Append(new UserKitchen
             {
@@ -40,24 +32,24 @@ namespace Inventory.API.Services
                 KitchenId = kitchenEntity.Id
             });
 
-            await _kitchenRepository.Add(kitchenEntity);
+            await kitchenRepository.Add(kitchenEntity);
 
-            await _kitchenRepository.SaveChanges();
+            await kitchenRepository.SaveChanges();
 
-            return _mapper.Map<KitchenResponseDTO>(kitchenEntity);
+            return mapper.Map<KitchenResponseDTO>(kitchenEntity);
         }
 
         public async Task<bool> DeleteKitchen(Guid kitchenId)
         {
-            var kitchenToDelete = await _kitchenRepository.GetById(kitchenId);
+            var kitchenToDelete = await kitchenRepository.GetById(kitchenId);
 
             if (kitchenToDelete == null)
             {
                 return false;
             }
             
-            _kitchenRepository.Delete(kitchenToDelete);
-            await _kitchenRepository.SaveChanges();
+            kitchenRepository.Delete(kitchenToDelete);
+            await kitchenRepository.SaveChanges();
             
             return true;
         }
@@ -74,8 +66,8 @@ namespace Inventory.API.Services
                 throw new ArgumentNullException(nameof(kitchenId), "Kitchen ID is required");
             }
             
-            var kitchen = await _kitchenRepository.GetById(kitchenId.Value);
-            return  _mapper.Map<KitchenResponseDTO>(kitchen);
+            var kitchen = await kitchenRepository.GetById(kitchenId.Value);
+            return  mapper.Map<KitchenResponseDTO>(kitchen);
         }
 
         public async Task<IEnumerable<KitchenResponseDTO>> GetKitchens(string userId)
@@ -85,8 +77,8 @@ namespace Inventory.API.Services
                 throw new ArgumentNullException(nameof(userId), "User ID is required");
             }
 
-            var kitchens = await _kitchenRepository.GetAll(userId);
-            return _mapper.Map<IEnumerable<KitchenResponseDTO>>(kitchens);
+            var kitchens = await kitchenRepository.GetAll(userId);
+            return mapper.Map<IEnumerable<KitchenResponseDTO>>(kitchens);
         }
     }
 }

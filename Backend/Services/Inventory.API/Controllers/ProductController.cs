@@ -1,7 +1,6 @@
 ﻿using System.Security.Claims;
 using Inventory.API.DTOs.Request;
 using Inventory.API.DTOs.Response;
-using Inventory.API.Models;
 using Inventory.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -43,14 +42,14 @@ namespace Inventory.API.Controllers
         [HttpPost]
         [ProducesResponseType(typeof(ProductResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> CreateProductRequest([FromBody] CreateProductRequestDTO productDto)
+        public async Task<IActionResult> CreateProductRequest([FromBody] CreateProductRequestDto productDto)
         {
             var userId = GetCurrentUserId();
-            
-            //first created with Scope = private: visible only for this user
-            var newProductDTO = await _productService.CreateProduct(productDto, userId);
 
-            return CreatedAtAction(nameof(newProductDTO), new { productId = newProductDTO.Id }, newProductDTO);
+            //first created with Scope = private: visible only for this user
+            var newProductDto = await _productService.CreateProduct(productDto, userId);
+
+            return CreatedAtAction(nameof(GetProduct), new { productId = newProductDto.Id }, newProductDto);
         }
 
         //only for admins
@@ -73,14 +72,9 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ChangeProductScope([FromRoute] Guid productId, [FromBody] ChangeProductScopeDTO changeProductScopeDto)
+        public async Task<IActionResult> ChangeProductScope([FromRoute] Guid productId, [FromBody] ChangeProductScopeDto changeProductScopeDto)
         {
-            var success = await _productService.ChangeProductScope(productId, changeProductScopeDto.NewScope);
-
-            if (!success)
-            {
-                return NotFound();
-            }
+            await _productService.ChangeProductScope(productId, changeProductScopeDto);
             return NoContent();
         }
     }

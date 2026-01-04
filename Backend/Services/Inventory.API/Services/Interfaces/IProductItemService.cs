@@ -7,7 +7,7 @@ namespace Inventory.API.Services.Interfaces
     {
         Task<ProductItemResponseDTO> GetItemFromKitchen(Guid kitchenId, Guid itemId, string userId);
         Task<IEnumerable<ProductItemResponseDTO>> GetItemsFromKitchen(Guid kitchenId, string userId);
-        Task<ProductItemResponseDTO> AddItemToKitchen(Guid kitchenId, CreateProductItemDTO itemDTO);
+        Task<ProductItemResponseDTO> AddItemToKitchen(Guid kitchenId, CreateProductItemDto itemDTO);
         Task DeleteItemFromKitchen(Guid kitchenId, Guid itemId, string userId);
     }
 }

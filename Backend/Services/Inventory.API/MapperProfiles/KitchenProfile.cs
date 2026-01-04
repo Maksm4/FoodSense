@@ -8,7 +8,7 @@ namespace Inventory.API.MapperProfiles
     {
         public KitchenProfile()
         {
-            CreateMap<CreateKitchenDTO, Kitchen>();
+            CreateMap<CreateKitchenDto, Kitchen>();
         }
     }
 }
