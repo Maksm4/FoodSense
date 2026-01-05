@@ -1,5 +1,4 @@
 ﻿using System.Security.Claims;
-using AutoMapper;
 using Inventory.API.DTOs.Request;
 using Inventory.API.DTOs.Response;
 using Inventory.API.Services.Interfaces;
@@ -11,13 +10,8 @@ namespace Inventory.API.Controllers
     [Route("api/kitchens/{kitchenId:guid}/items")]
     [ApiController]
     [Authorize]
-    public class ProductItemController : ControllerBase
+    public class ProductItemController(IProductItemService productItemService) : ControllerBase
     {
-        private readonly IProductItemService _productItemService;
-        public ProductItemController(IProductItemService productItemService)
-        {
-            _productItemService = productItemService;
-        }
         private string GetCurrentUserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "testing-userId";
@@ -31,13 +25,8 @@ namespace Inventory.API.Controllers
         {
             var userId = GetCurrentUserId();
 
-            var itemDTO = await _productItemService.GetItemFromKitchen(kitchenId, itemId, userId);
-            if (itemDTO == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(itemDTO);
+            var itemDto = await productItemService.GetItemFromKitchen(kitchenId, itemId, userId);
+            return Ok(itemDto);
         }
 
         [HttpGet]
@@ -47,7 +36,7 @@ namespace Inventory.API.Controllers
         {
             var userId = GetCurrentUserId();
 
-            var items = await _productItemService.GetItemsFromKitchen(kitchenId, userId);
+            var items = await productItemService.GetItemsFromKitchen(kitchenId, userId);
             return Ok(items);
         }
 
@@ -55,10 +44,10 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(typeof(ProductItemResponseDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> CreateProductItem(Guid kitchenId, [FromBody] CreateProductItemDto itemDTO)
+        public async Task<IActionResult> CreateProductItem(Guid kitchenId, [FromBody] CreateProductItemDto itemDto)
         {
-            var createdItem = await _productItemService.AddItemToKitchen(kitchenId, itemDTO);
-            return CreatedAtAction(nameof(GetProductItems), new { kitchenId = kitchenId }, createdItem);
+            var createdItem = await productItemService.AddItemToKitchen(kitchenId, itemDto);
+            return CreatedAtAction(nameof(GetProductItems), new { kitchenId }, createdItem);
         }
 
         [HttpDelete("{itemId:guid}")]
@@ -68,9 +57,8 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> DeleteProductItem([FromRoute] Guid kitchenId, [FromRoute] Guid itemId)
         {
             var userId = GetCurrentUserId();
-
-            await _productItemService.DeleteItemFromKitchen(kitchenId, itemId, userId);
-
+            
+            await productItemService.DeleteItemFromKitchen(kitchenId, itemId, userId);
             return NoContent();
         }
     }

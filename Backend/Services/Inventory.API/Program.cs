@@ -14,7 +14,7 @@ builder.Services.AddDbContext<InventoryDbContext>(
 builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(KitchenProfile));
-
+builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -23,8 +23,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
-app.UseStatusCodeException(); // custom middleware for handling exceptions
-
+app.UseExceptionHandler(opt => { });
 app.MapControllers();
 
 app.Run();

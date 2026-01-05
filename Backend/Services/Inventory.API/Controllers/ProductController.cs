@@ -40,7 +40,6 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> CreateProductRequest([FromBody] CreateProductRequestDto productDto)
         {
             var userId = GetCurrentUserId();
-
             //first created with Scope = private: visible only for this user
             var newProductDto = await productService.CreateProduct(productDto, userId);
 
