@@ -10,13 +10,8 @@ namespace Inventory.API.Controllers
     [Route("api/products")]
     [ApiController]
     [Authorize]
-    public class ProductController : ControllerBase
+    public class ProductController(IProductService productService) : ControllerBase
     {
-        private readonly IProductService _productService;
-        public ProductController(IProductService productService)
-        {
-            _productService = productService;
-        }
         private string GetCurrentUserId()
         {
             return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "testing-userId";
@@ -26,7 +21,7 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<ProductResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProducts([FromQuery] string? search, [FromQuery] int limit = 10)
         {
-            var products = await _productService.GetProducts(search, limit);
+            var products = await productService.GetProducts(search, limit);
             return Ok(products);
         }
 
@@ -35,7 +30,7 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(typeof(ProductResponseDTO), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetProduct([FromRoute] Guid productId)
         {
-            var product = await _productService.GetProductById(productId);
+            var product = await productService.GetProductById(productId);
             return Ok(product);
         }
 
@@ -47,7 +42,7 @@ namespace Inventory.API.Controllers
             var userId = GetCurrentUserId();
 
             //first created with Scope = private: visible only for this user
-            var newProductDto = await _productService.CreateProduct(productDto, userId);
+            var newProductDto = await productService.CreateProduct(productDto, userId);
 
             return CreatedAtAction(nameof(GetProduct), new { productId = newProductDto.Id }, newProductDto);
         }
@@ -61,7 +56,7 @@ namespace Inventory.API.Controllers
 
         public async Task<IActionResult> DeleteProduct([FromRoute] Guid productId)
         {
-            await _productService.DeleteProduct(productId);
+            await productService.DeleteProduct(productId);
             return NoContent();
         }
         
@@ -74,7 +69,7 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> ChangeProductScope([FromRoute] Guid productId, [FromBody] ChangeProductScopeDto changeProductScopeDto)
         {
-            await _productService.ChangeProductScope(productId, changeProductScopeDto);
+            await productService.ChangeProductScope(changeProductScopeDto);
             return NoContent();
         }
     }
