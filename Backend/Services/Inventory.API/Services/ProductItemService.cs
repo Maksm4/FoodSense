@@ -34,17 +34,11 @@ namespace Inventory.API.Services
 
         public async Task<IEnumerable<ProductItemResponseDTO>> GetItemsFromKitchen(Guid? kitchenId)
         {
-            if (kitchenId == null || kitchenId == Guid.Empty)
-            {
-                throw new ArgumentNullException(nameof(kitchenId), "Kitchen ID is required");
-            }
-            
             var userId = currentUser.UserId;
             await UserHasAccessToKitchen(kitchenId, userId);
 
             var productItems = await productItemRepository.GetAllProductItems(kitchenId.Value);
             return mapper.Map<IEnumerable<ProductItemResponseDTO>>(productItems);
-            
         }
 
         public async Task<ProductItemResponseDTO> AddItemToKitchen(Guid? kitchenId, CreateProductItemDto? itemDto)

@@ -9,7 +9,5 @@ namespace Inventory.API.Services.Interfaces
         Task<ProductResponseDTO?> GetProductById(Guid? productId);
         Task<ProductResponseDTO> CreateProduct(CreateProductRequestDto? productDto, string? userId);
         Task DeleteProduct(Guid? productId);
-        
-        Task ChangeProductScope(ChangeProductScopeDto? changeProductScopeDto);
     }
 }

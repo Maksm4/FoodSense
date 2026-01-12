@@ -24,7 +24,7 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> GetKitchen([FromRoute] Guid kitchenId)
         {
             var userId = GetCurrentUserId();
-            var kitchenDto = await kitchenService.GetKitchen(kitchenId, userId);
+            var kitchenDto = await kitchenService.GetKitchen(kitchenId);
             return Ok(kitchenDto);
         }
         
@@ -34,7 +34,7 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> GetKitchens()
         {
             var userId = GetCurrentUserId();
-            var kitchensDto = await kitchenService.GetKitchens(userId);
+            var kitchensDto = await kitchenService.GetKitchens();
 
             return Ok(kitchensDto);
         }
@@ -45,7 +45,7 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> CreateKitchen([FromBody] CreateKitchenDto? createKitchenDto)
         {
             var userId = GetCurrentUserId();
-            var createdKitchenDto = await kitchenService.CreateKitchen(createKitchenDto, userId);
+            var createdKitchenDto = await kitchenService.CreateKitchen(createKitchenDto);
 
             return CreatedAtAction(nameof(GetKitchen), new { kitchenId = createdKitchenDto.Id }, createdKitchenDto);
         }

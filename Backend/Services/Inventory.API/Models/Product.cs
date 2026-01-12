@@ -13,6 +13,7 @@ namespace Inventory.API.Models
         public Category Category { get; set; }
         //public string VisualRepresentation base64 ?
         public ProductScope Scope { get; set; } = ProductScope.Private;
+        public string CreatedBy { get; set; } = string.Empty;
         public IEnumerable<ProductItem> ProductItems { get; set;  } = [];
         public Unit DefaultUnit { get; set; }
     }

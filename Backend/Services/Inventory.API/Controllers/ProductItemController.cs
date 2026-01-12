@@ -25,7 +25,7 @@ namespace Inventory.API.Controllers
         {
             var userId = GetCurrentUserId();
 
-            var itemDto = await productItemService.GetItemFromKitchen(kitchenId, itemId, userId);
+            var itemDto = await productItemService.GetItemFromKitchen(kitchenId, itemId);
             return Ok(itemDto);
         }
 
@@ -36,7 +36,7 @@ namespace Inventory.API.Controllers
         {
             var userId = GetCurrentUserId();
 
-            var items = await productItemService.GetItemsFromKitchen(kitchenId, userId);
+            var items = await productItemService.GetItemsFromKitchen(kitchenId);
             return Ok(items);
         }
 
@@ -58,7 +58,7 @@ namespace Inventory.API.Controllers
         {
             var userId = GetCurrentUserId();
             
-            await productItemService.DeleteItemFromKitchen(kitchenId, itemId, userId);
+            await productItemService.DeleteItemFromKitchen(kitchenId, itemId);
             return NoContent();
         }
     }

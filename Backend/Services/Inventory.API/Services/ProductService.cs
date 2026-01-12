@@ -1,6 +1,7 @@
 ﻿using System.Runtime.InteropServices.ComTypes;
 using AutoMapper;
 using Common.Exceptions;
+using Common.Services;
 using Inventory.API.Data.Interfaces;
 using Inventory.API.DTOs.Request;
 using Inventory.API.DTOs.Response;
@@ -9,7 +10,7 @@ using Inventory.API.Services.Interfaces;
 
 namespace Inventory.API.Services
 {
-    public class ProductService(IProductRepository kitchenRepository, IMapper mapper) : IProductService
+    public class ProductService(IProductRepository productRepository, ICurrentUser currentUser, IMapper mapper) : IProductService
     {
         public async Task<IEnumerable<ProductResponseDTO>> GetProducts(string? search, int limit = 10)
         {
@@ -20,7 +21,9 @@ namespace Inventory.API.Services
             
             if (limit > 20) limit = 20;
 
-            var products = await kitchenRepository.GetProductsByName(search, limit);
+            var userId = currentUser.UserId; 
+            
+            var products = await productRepository.GetProductsByName(search, limit, userId);
             return mapper.Map<IEnumerable<ProductResponseDTO>>(products);
         }
 
@@ -30,8 +33,16 @@ namespace Inventory.API.Services
             {
                 throw new ArgumentException("Product ID cannot be empty or null", nameof(productId));
             }
+            var userId = currentUser.UserId;
             
-            Product? product =  await kitchenRepository.GetById(productId.Value);
+            Product? product =  await productRepository.GetById(productId.Value);
+            
+            // Ensure the product is either global or created by the current user
+            if (product is { Scope: ProductScope.Private } && product.CreatedBy != userId)
+            {
+                return null;
+            }
+            
             return product == null ? null : mapper.Map<ProductResponseDTO>(product);
         }
 
@@ -47,12 +58,14 @@ namespace Inventory.API.Services
             }
             var productEntity = mapper.Map<Product>(productDto);
             
-            await kitchenRepository.Add(productEntity);
-            await kitchenRepository.SaveChanges();
+            await productRepository.Add(productEntity);
+            await productRepository.SaveChanges();
 
             return mapper.Map<ProductResponseDTO>(productEntity);
         }
-
+        
+        // TODO: create deleteProduct for global products - admin only
+        // only for private products
         public async Task DeleteProduct(Guid? productId)
         {
             if (productId == null || productId == Guid.Empty)
@@ -60,31 +73,45 @@ namespace Inventory.API.Services
                 throw new ArgumentException("Product ID cannot be null or empty", nameof(productId));
             }
             
-            Product? product = await kitchenRepository.GetById(productId.Value);
-
-            if (product == null)
+            var userId = currentUser.UserId;
+            if (string.IsNullOrEmpty(userId))
             {
-                throw new NotFoundException("Product not found");
+                throw new ArgumentException("User ID is required", nameof(userId));
             }
-            kitchenRepository.Delete(product);
-            await kitchenRepository.SaveChanges();
-        }
 
-        public async Task ChangeProductScope(ChangeProductScopeDto? changeProductScopeDto)
-        {
-            if (changeProductScopeDto == null)
+            if (!await productRepository.IsProductOwnedByUser(productId.Value, userId))
             {
-                throw new ArgumentNullException(nameof(changeProductScopeDto), "ChangeProductScope data is required");
+                throw new NotFoundException("Cannot find product or no permission to delete");
             }
             
-            Product? product = await kitchenRepository.GetById(changeProductScopeDto.ProductId);
+            Product? product = await productRepository.GetById(productId.Value);
+            
             if (product == null)
             {
                 throw new NotFoundException("Product not found");
             }
             
-            product.Scope = changeProductScopeDto.NewScope; 
-            await kitchenRepository.SaveChanges();   
+            productRepository.Delete(product);
+            await productRepository.SaveChanges();
         }
+        
+        // TODO: to be moved to admin specific controller
+        
+        // public async Task ChangeProductScope(ChangeProductScopeDto? changeProductScopeDto)
+        // {
+        //     if (changeProductScopeDto == null)
+        //     {
+        //         throw new ArgumentNullException(nameof(changeProductScopeDto), "ChangeProductScope data is required");
+        //     }
+        //     
+        //     Product? product = await productRepository.GetById(changeProductScopeDto.ProductId);
+        //     if (product == null)
+        //     {
+        //         throw new NotFoundException("Product not found");
+        //     }
+        //     
+        //     product.Scope = changeProductScopeDto.NewScope; 
+        //     await productRepository.SaveChanges();   
+        // }
     }
 }

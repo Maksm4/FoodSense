@@ -11,7 +11,7 @@
     }
     public enum ProductScope
     {
-        System,
+        Global,
         Private,
         Pending
     }

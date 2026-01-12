@@ -60,16 +60,17 @@ namespace Inventory.API.Controllers
         }
         
         //change scope of product
-        //only for admins
-        [HttpPatch("{productId:Guid}/scope")]
-        [Authorize(Roles = "Admin")]
-        [ProducesResponseType(StatusCodes.Status204NoContent)]
-        [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> ChangeProductScope([FromRoute] Guid productId, [FromBody] ChangeProductScopeDto changeProductScopeDto)
-        {
-            await productService.ChangeProductScope(changeProductScopeDto);
-            return NoContent();
-        }
+        //TODO: only for admins
+        
+        // [HttpPatch("{productId:Guid}/scope")]
+        // [Authorize(Roles = "Admin")]
+        // [ProducesResponseType(StatusCodes.Status204NoContent)]
+        // [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        // [ProducesResponseType(StatusCodes.Status404NotFound)]
+        // public async Task<IActionResult> ChangeProductScope([FromRoute] Guid productId, [FromBody] ChangeProductScopeDto changeProductScopeDto)
+        // {
+        //     await productService.ChangeProductScope(changeProductScopeDto);
+        //     return NoContent();
+        // }
     }
 }

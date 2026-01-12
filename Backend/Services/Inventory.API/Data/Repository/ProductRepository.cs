@@ -9,12 +9,18 @@ namespace Inventory.API.Data.Repository
     {
         private readonly InventoryDbContext _context = context;
 
-        public async Task<ICollection<Product>> GetProductsByName(string search, int limit)
+        public async Task<ICollection<Product>> GetProductsByName(string search, int limit, string? userId)
         {
             return await _context.Products
-                .Where(p => p.Name.Contains(search))
+                .Where(p => p.Name.Contains(search) && (p.Scope == ProductScope.Global || (userId != null && p.CreatedBy == userId)))
                 .Take(limit)
                 .ToListAsync();
+        }
+
+        public async Task<bool> IsProductOwnedByUser(Guid productId, string userId)
+        {
+            return await _context.Products
+                .AnyAsync(p => p.Id == productId && p.CreatedBy == userId);
         }
     }
 }

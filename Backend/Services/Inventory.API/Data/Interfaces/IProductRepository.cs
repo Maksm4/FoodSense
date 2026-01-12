@@ -4,6 +4,7 @@ namespace Inventory.API.Data.Interfaces
 {
     public interface IProductRepository : IGenericRepository<Product>
     {
-        Task<ICollection<Product>> GetProductsByName(string search, int limit);
+        Task<ICollection<Product>> GetProductsByName(string search, int limit, string? userId);
+        Task<bool> IsProductOwnedByUser(Guid productId, string userId);
     }
 }
