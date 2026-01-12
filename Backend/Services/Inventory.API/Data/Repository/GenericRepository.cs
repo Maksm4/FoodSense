@@ -4,17 +4,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.API.Data.Repository
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T>(InventoryDbContext context) : IGenericRepository<T>
+        where T : class
     {
-        private readonly InventoryDbContext _context;
-        private readonly DbSet<T> _dbSet;
+        private readonly DbSet<T> _dbSet = context.Set<T>();
 
-        public GenericRepository(InventoryDbContext context)
-        {
-            _context = context;
-            _dbSet = context.Set<T>();
-        }
-        
         public async Task Add(T entity)
         {
             await _dbSet.AddAsync(entity);
@@ -41,7 +35,7 @@ namespace Inventory.API.Data.Repository
         }
         public async Task SaveChanges()
         {
-            await _context.SaveChangesAsync();
+            await context.SaveChangesAsync();
         }
     }
 }

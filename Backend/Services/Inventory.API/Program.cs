@@ -1,4 +1,5 @@
 using Common.Middlewares;
+using Common.Services;
 using Inventory.API.Data.Context;
 using Inventory.API.Data.Interfaces;
 using Inventory.API.Data.Repository;
@@ -23,6 +24,10 @@ builder.Services.AddScoped<IProductItemService, ProductItemService>();
 builder.Services.AddScoped<IKitchenRepository, KitchenRepository>();
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<IProductItemRepository, ProductItemRepository>();
+
+//Common
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HeaderCurrentUser>();
 
 builder.Services.AddControllers();
 

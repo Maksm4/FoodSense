@@ -11,6 +11,8 @@ namespace Inventory.API.Data.Context.Configuration
             builder.ToTable("UserKitchen");
             builder.HasKey(uk => uk.Id).HasName("PK_UserKitchen");
             builder.Property(uk => uk.Id).ValueGeneratedOnAdd();
+            
+            builder.HasIndex(uk => uk.UserId);
         }
     }
 }

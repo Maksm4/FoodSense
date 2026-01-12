@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Common.Exceptions;
+using Common.Services;
 using Inventory.API.Data.Interfaces;
 using Inventory.API.DTOs.Request;
 using Inventory.API.DTOs.Response;
@@ -8,18 +9,19 @@ using Inventory.API.Services.Interfaces;
 
 namespace Inventory.API.Services
 {
-    public class KitchenService(IKitchenRepository kitchenRepository, IMapper mapper) : IKitchenService
+    public class KitchenService(IKitchenRepository kitchenRepository, ICurrentUser currentUser, IMapper mapper) : IKitchenService
     {
-        public async Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDto? kitchenDto, string? userId)
+        public async Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDto? kitchenDto)
         {
             if (kitchenDto == null)
             {
                 throw new ArgumentNullException(nameof(kitchenDto), "Kitchen data is required");
             }
 
+            var userId = currentUser.UserId;
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentException("User ID is required", nameof(userId));
+                throw new UnauthorizedAccessException("User is not authenticated");
             }
 
             var kitchenEntity = mapper.Map<Kitchen>(kitchenDto);
@@ -44,33 +46,45 @@ namespace Inventory.API.Services
                 throw new ArgumentException("Kitchen ID cannot be null or empty", nameof(kitchenId));
             }
             
+            var userId = currentUser.UserId;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated");
+            }
+            
             var kitchenToDelete = await kitchenRepository.GetById(kitchenId.Value);
-
             if (kitchenToDelete == null)
             {
                 return false;
             }
-
+            
+            var canDelete = await kitchenRepository.IsUserOwner(kitchenId.Value, userId);
+            if (!canDelete)
+            {
+                throw new NotFoundException("kitchen not found or no permission to delete");
+            }
+            
             kitchenRepository.Delete(kitchenToDelete);
             await kitchenRepository.SaveChanges();
 
             return true;
         }
 
-        public async Task<KitchenResponseDTO?> GetKitchen(Guid? kitchenId, string? userId)
+        public async Task<KitchenResponseDTO?> GetKitchen(Guid? kitchenId)
         {
-            if (string.IsNullOrEmpty(userId))
-            {
-                throw new ArgumentNullException(nameof(userId), "User ID is required");
-            }
-
-            if (kitchenId == null)
+            if (kitchenId == null || kitchenId == Guid.Empty)
             {
                 throw new ArgumentNullException(nameof(kitchenId), "Kitchen ID is required");
             }
-
+            
+            var userId = currentUser.UserId;
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new UnauthorizedAccessException("User is not authenticated.");
+            }
+            
             var kitchen = await kitchenRepository.GetById(kitchenId.Value);
-            if (kitchen == null)
+            if (kitchen == null || !await kitchenRepository.IsUserMember(kitchenId.Value, userId))
             {
                 throw new NotFoundException("kitchen not found");
             }
@@ -78,13 +92,14 @@ namespace Inventory.API.Services
             return mapper.Map<KitchenResponseDTO>(kitchen);
         }
 
-        public async Task<IEnumerable<KitchenResponseDTO>> GetKitchens(string? userId)
+        public async Task<IEnumerable<KitchenResponseDTO>> GetKitchens()
         {
+            var userId = currentUser.UserId;
             if (string.IsNullOrEmpty(userId))
             {
-                throw new ArgumentNullException(nameof(userId), "User ID is required");
+                throw new UnauthorizedAccessException("User is not authenticated.");
             }
-
+            
             var kitchens = await kitchenRepository.GetAll(userId);
             return mapper.Map<IEnumerable<KitchenResponseDTO>>(kitchens);
         }
