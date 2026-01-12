@@ -10,7 +10,7 @@ namespace Inventory.API.Services
 {
     public class KitchenService(IKitchenRepository kitchenRepository, IMapper mapper) : IKitchenService
     {
-        public async Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDto? kitchenDto, string userId)
+        public async Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDto? kitchenDto, string? userId)
         {
             if (kitchenDto == null)
             {
@@ -37,9 +37,14 @@ namespace Inventory.API.Services
             return mapper.Map<KitchenResponseDTO>(kitchenEntity);
         }
 
-        public async Task<bool> DeleteKitchen(Guid kitchenId)
+        public async Task<bool> DeleteKitchen(Guid? kitchenId)
         {
-            var kitchenToDelete = await kitchenRepository.GetById(kitchenId);
+            if(kitchenId == null || kitchenId == Guid.Empty)
+            {
+                throw new ArgumentException("Kitchen ID cannot be null or empty", nameof(kitchenId));
+            }
+            
+            var kitchenToDelete = await kitchenRepository.GetById(kitchenId.Value);
 
             if (kitchenToDelete == null)
             {
@@ -73,7 +78,7 @@ namespace Inventory.API.Services
             return mapper.Map<KitchenResponseDTO>(kitchen);
         }
 
-        public async Task<IEnumerable<KitchenResponseDTO>> GetKitchens(string userId)
+        public async Task<IEnumerable<KitchenResponseDTO>> GetKitchens(string? userId)
         {
             if (string.IsNullOrEmpty(userId))
             {

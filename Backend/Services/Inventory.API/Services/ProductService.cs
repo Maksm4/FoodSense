@@ -24,19 +24,27 @@ namespace Inventory.API.Services
             return mapper.Map<IEnumerable<ProductResponseDTO>>(products);
         }
 
-        public async Task<ProductResponseDTO?> GetProductById(Guid productId)
+        public async Task<ProductResponseDTO?> GetProductById(Guid? productId)
         {
-            if (productId == Guid.Empty)
+            if (productId == Guid.Empty || productId == null)
             {
-                throw new ArgumentException("Product ID cannot be empty", nameof(productId));
+                throw new ArgumentException("Product ID cannot be empty or null", nameof(productId));
             }
             
-            Product? product =  await kitchenRepository.GetById(productId);
+            Product? product =  await kitchenRepository.GetById(productId.Value);
             return product == null ? null : mapper.Map<ProductResponseDTO>(product);
         }
 
-        public async Task<ProductResponseDTO> CreateProduct(CreateProductRequestDto? productDto, string userId)
+        public async Task<ProductResponseDTO> CreateProduct(CreateProductRequestDto? productDto, string? userId)
         {
+            if (productDto == null)
+            {
+                throw new ArgumentNullException(nameof(productDto), "Product data is required");
+            }
+            if (string.IsNullOrEmpty(userId))
+            {
+                throw new ArgumentException("User ID is required", nameof(userId));
+            }
             var productEntity = mapper.Map<Product>(productDto);
             
             await kitchenRepository.Add(productEntity);
@@ -45,9 +53,14 @@ namespace Inventory.API.Services
             return mapper.Map<ProductResponseDTO>(productEntity);
         }
 
-        public async Task DeleteProduct(Guid productId)
+        public async Task DeleteProduct(Guid? productId)
         {
-            Product? product = await kitchenRepository.GetById(productId);
+            if (productId == null || productId == Guid.Empty)
+            {
+                throw new ArgumentException("Product ID cannot be null or empty", nameof(productId));
+            }
+            
+            Product? product = await kitchenRepository.GetById(productId.Value);
 
             if (product == null)
             {
@@ -57,8 +70,13 @@ namespace Inventory.API.Services
             await kitchenRepository.SaveChanges();
         }
 
-        public async Task ChangeProductScope(ChangeProductScopeDto changeProductScopeDto)
+        public async Task ChangeProductScope(ChangeProductScopeDto? changeProductScopeDto)
         {
+            if (changeProductScopeDto == null)
+            {
+                throw new ArgumentNullException(nameof(changeProductScopeDto), "ChangeProductScope data is required");
+            }
+            
             Product? product = await kitchenRepository.GetById(changeProductScopeDto.ProductId);
             if (product == null)
             {

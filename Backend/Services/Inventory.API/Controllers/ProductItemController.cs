@@ -47,7 +47,7 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> CreateProductItem(Guid kitchenId, [FromBody] CreateProductItemDto itemDto)
         {
             var createdItem = await productItemService.AddItemToKitchen(kitchenId, itemDto);
-            return CreatedAtAction(nameof(GetProductItems), new { kitchenId }, createdItem);
+            return CreatedAtAction(nameof(GetProductItemById), new { kitchenId }, createdItem);
         }
 
         [HttpDelete("{itemId:guid}")]

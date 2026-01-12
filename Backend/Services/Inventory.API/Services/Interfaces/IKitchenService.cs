@@ -5,9 +5,9 @@ namespace Inventory.API.Services.Interfaces
 {
     public interface IKitchenService
     {
-        Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDto? kitchenDTO, string userId);
-        Task<KitchenResponseDTO?> GetKitchen(Guid? kitchenId, string userId);
-        Task<IEnumerable<KitchenResponseDTO>> GetKitchens(string userId);
-        Task<bool> DeleteKitchen(Guid kitchenId);
+        Task<KitchenResponseDTO> CreateKitchen(CreateKitchenDto? kitchenDto, string? userId);
+        Task<KitchenResponseDTO?> GetKitchen(Guid? kitchenId, string? userId);
+        Task<IEnumerable<KitchenResponseDTO>> GetKitchens(string? userId);
+        Task<bool> DeleteKitchen(Guid? kitchenId);
     }
 }
