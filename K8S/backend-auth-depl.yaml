@@ -1,20 +1,20 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-inventory-depl
+  name: auth-api-depl
 spec:
   replicas: 1
   selector:
     matchLabels:
-      app: inventory-api
+      app: auth-api
   template:
     metadata:
       labels:
-        app: inventory-api
+        app: auth-api
     spec:
       containers:
-        - name: inventory-api
-          image: maksm4/inventoryapi:latest
+        - name: auth-api
+          image: maksm4/authapi:latest
           ports:
             - containerPort: 8080
           env:
@@ -22,4 +22,4 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: inventory-conn
+                  key: auth-conn
