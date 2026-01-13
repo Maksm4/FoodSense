@@ -15,6 +15,7 @@ spec:
       containers:
         - name: inventory-api
           image: maksm4/inventoryapi:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8080
           env:

@@ -12,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<InventoryDbContext>(
-        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("InventoryConnection"))
+        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
 //services
@@ -43,5 +43,21 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseExceptionHandler(opt => { });
 app.MapControllers();
-
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<InventoryDbContext>(); 
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database");
+    }
+}
 app.Run();

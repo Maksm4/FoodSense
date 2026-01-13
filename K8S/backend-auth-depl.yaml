@@ -15,6 +15,7 @@ spec:
       containers:
         - name: auth-api
           image: maksm4/authapi:latest
+          imagePullPolicy: Never
           ports:
             - containerPort: 8080
           env:
@@ -23,3 +24,8 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: auth-conn
+            - name: JwtSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: jwt-key

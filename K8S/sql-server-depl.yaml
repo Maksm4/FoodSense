@@ -18,11 +18,11 @@ spec:
         env:
         - name: ACCEPT_EULA
           value: "Y"
-        name: MSSQL_SA_PASSWORD
-        valueFrom:  
-            secretKeyRef:
-              name: app-secrets
-              key: sa-password
+        - name: MSSQL_SA_PASSWORD
+          valueFrom:  
+              secretKeyRef:
+                name: app-secrets
+                key: sa-password
         ports:
         - containerPort: 1433
 ---
