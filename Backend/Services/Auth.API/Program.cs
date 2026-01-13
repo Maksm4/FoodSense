@@ -1,5 +1,6 @@
 using Auth.API.Database;
 using Auth.API.Services;
+using Common.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
@@ -26,6 +27,8 @@ public class Program
             .AddEntityFrameworkStores<AuthDbContext>(); 
         
         builder.Services.AddScoped<ITokenService, TokenService>();
+        builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
+        
         var app = builder.Build();
         if (app.Environment.IsDevelopment())
         {
@@ -33,6 +36,7 @@ public class Program
         }
 
         app.UseHttpsRedirection();
+        app.UseExceptionHandler(opt => { });
         app.UseAuthorization();
 
         app.MapControllers();
