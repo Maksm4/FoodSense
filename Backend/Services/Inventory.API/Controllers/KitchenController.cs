@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Inventory.API.Controllers
 {
-    [Route("api/kitchens")]
+    [Route("api/inventory/kitchens")]
     [ApiController]
     [Authorize]
     public class KitchenController(IKitchenService kitchenService) : ControllerBase

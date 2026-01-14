@@ -1,0 +1,32 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gateway-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gateway-api
+  template:
+    metadata:
+      labels:
+        app: gateway-api
+    spec:
+      containers:
+      - name: gateway-api
+        image: maksm4/gatewayapi:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 8080
+        env:
+        - name: JwtSettings__SecretKey
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets
+              key: jwt-key
+              
+        - name: ReverseProxy__Clusters__AuthAPICluster__Destinations__AuthAPIDestination__Address
+          value: "http://auth-srv:80"
+
+        - name: ReverseProxy__Clusters__InventoryAPICluster__Destinations__InventoryAPIDestination__Address
+          value: "http://node-port-srv:80"
