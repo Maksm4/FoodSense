@@ -12,6 +12,10 @@ spec:
       labels:
         app: inventory-api
     spec:
+      initContainers:
+        - name: wait-for-sql
+          image: busybox
+          command: ['sh', '-c', "until nc -z sql-server-service 1433; do echo waiting for sql; sleep 2; done"]
       containers:
         - name: inventory-api
           image: maksm4/inventoryapi:latest
@@ -24,3 +28,8 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: inventory-conn
+            - name: JwtSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: jwt-key

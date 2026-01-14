@@ -13,10 +13,13 @@ namespace Inventory.API.Data.Context.Configuration
             builder.HasKey(c => c.Id).HasName("PK_Category");
             builder.Property(c => c.Name).IsRequired().HasMaxLength(100);
             builder.Property(c => c.Id).ValueGeneratedOnAdd();
+            
             builder.HasMany(c => c.Products)
-                .WithOne()
+                .WithOne(p => p.Category)
                 .HasForeignKey(p => p.CategoryId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+            ;
         }
     }
 }

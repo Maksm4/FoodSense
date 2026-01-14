@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Http;
 
 namespace Common.Services;
@@ -8,12 +9,10 @@ public class HeaderCurrentUser(IHttpContextAccessor httpContextAccessor) : ICurr
     {
         get
         {
-            var context = httpContextAccessor.HttpContext;
-            if (context != null && context.Request.Headers.TryGetValue("X-User-Id", out var userIdHeader))
-            {
-                return userIdHeader.ToString();
-            }
-            return null;
+            var user = httpContextAccessor.HttpContext?.User;
+
+            return user?.FindFirstValue(ClaimTypes.NameIdentifier)
+                   ?? null;
         }
     }
 }

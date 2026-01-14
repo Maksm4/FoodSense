@@ -12,19 +12,12 @@ namespace Inventory.API.Controllers
     [Authorize]
     public class ProductItemController(IProductItemService productItemService) : ControllerBase
     {
-        private string GetCurrentUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "testing-userId";
-        }
-
         [HttpGet("{itemId:guid}")]
         [ProducesResponseType(typeof(ProductItemResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetProductItemById([FromRoute] Guid kitchenId, [FromRoute] Guid itemId)
         {
-            var userId = GetCurrentUserId();
-
             var itemDto = await productItemService.GetItemFromKitchen(kitchenId, itemId);
             return Ok(itemDto);
         }
@@ -34,8 +27,6 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetProductItems([FromRoute] Guid kitchenId)
         {
-            var userId = GetCurrentUserId();
-
             var items = await productItemService.GetItemsFromKitchen(kitchenId);
             return Ok(items);
         }
@@ -56,8 +47,6 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> DeleteProductItem([FromRoute] Guid kitchenId, [FromRoute] Guid itemId)
         {
-            var userId = GetCurrentUserId();
-            
             await productItemService.DeleteItemFromKitchen(kitchenId, itemId);
             return NoContent();
         }

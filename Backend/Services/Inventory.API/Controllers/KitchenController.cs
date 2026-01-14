@@ -12,18 +12,12 @@ namespace Inventory.API.Controllers
     [Authorize]
     public class KitchenController(IKitchenService kitchenService) : ControllerBase
     {
-        private string GetCurrentUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "testing-userId";
-        }
-
         [HttpGet("{kitchenId:guid}")]
         [ProducesResponseType(typeof(KitchenResponseDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
         public async Task<IActionResult> GetKitchen([FromRoute] Guid kitchenId)
         {
-            var userId = GetCurrentUserId();
             var kitchenDto = await kitchenService.GetKitchen(kitchenId);
             return Ok(kitchenDto);
         }
@@ -33,9 +27,7 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(typeof(IEnumerable<KitchenResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetKitchens()
         {
-            var userId = GetCurrentUserId();
             var kitchensDto = await kitchenService.GetKitchens();
-
             return Ok(kitchensDto);
         }
 
@@ -44,7 +36,6 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateKitchen([FromBody] CreateKitchenDto? createKitchenDto)
         {
-            var userId = GetCurrentUserId();
             var createdKitchenDto = await kitchenService.CreateKitchen(createKitchenDto);
 
             return CreatedAtAction(nameof(GetKitchen), new { kitchenId = createdKitchenDto.Id }, createdKitchenDto);

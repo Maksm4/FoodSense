@@ -1,3 +1,4 @@
+using System.Text;
 using Common.Middlewares;
 using Common.Services;
 using Inventory.API.Data.Context;
@@ -6,7 +7,9 @@ using Inventory.API.Data.Repository;
 using Inventory.API.MapperProfiles;
 using Inventory.API.Services;
 using Inventory.API.Services.Interfaces;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -33,16 +36,37 @@ builder.Services.AddControllers();
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(KitchenProfile));
 builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
+
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)), 
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 var app = builder.Build();
 
+app.UseExceptionHandler(opt => { });
 if (app.Environment.IsDevelopment())
 { 
     app.MapOpenApi();
 }
 
 app.UseHttpsRedirection();
-app.UseExceptionHandler(opt => { });
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
+
 using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;

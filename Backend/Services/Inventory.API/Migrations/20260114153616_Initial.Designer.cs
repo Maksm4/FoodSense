@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Inventory.API.Migrations
 {
     [DbContext(typeof(InventoryDbContext))]
-    [Migration("20260113210118_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20260114153616_Initial")]
+    partial class Initial
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -81,9 +81,6 @@ namespace Inventory.API.Migrations
                     b.Property<Guid>("CategoryId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("CategoryId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<string>("CreatedBy")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
@@ -109,8 +106,6 @@ namespace Inventory.API.Migrations
 
                     b.HasIndex("CategoryId");
 
-                    b.HasIndex("CategoryId1");
-
                     b.ToTable("Product", (string)null);
                 });
 
@@ -133,16 +128,10 @@ namespace Inventory.API.Migrations
                     b.Property<Guid>("KitchenId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<Guid>("KitchenId1")
-                        .HasColumnType("uniqueidentifier");
-
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
                     b.Property<Guid>("ProductId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("ProductId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateOnly>("PurchaseDate")
@@ -160,11 +149,7 @@ namespace Inventory.API.Migrations
 
                     b.HasIndex("KitchenId");
 
-                    b.HasIndex("KitchenId1");
-
                     b.HasIndex("ProductId");
-
-                    b.HasIndex("ProductId1");
 
                     b.ToTable("ProductItem", (string)null);
                 });
@@ -176,9 +161,6 @@ namespace Inventory.API.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<Guid>("KitchenId")
-                        .HasColumnType("uniqueidentifier");
-
-                    b.Property<Guid>("KitchenId1")
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("Role")
@@ -193,8 +175,6 @@ namespace Inventory.API.Migrations
 
                     b.HasIndex("KitchenId");
 
-                    b.HasIndex("KitchenId1");
-
                     b.HasIndex("UserId");
 
                     b.ToTable("UserKitchen", (string)null);
@@ -202,16 +182,10 @@ namespace Inventory.API.Migrations
 
             modelBuilder.Entity("Inventory.API.Models.Product", b =>
                 {
-                    b.HasOne("Inventory.API.Models.Category", null)
+                    b.HasOne("Inventory.API.Models.Category", "Category")
                         .WithMany("Products")
                         .HasForeignKey("CategoryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inventory.API.Models.Category", "Category")
-                        .WithMany()
-                        .HasForeignKey("CategoryId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Category");
@@ -219,28 +193,16 @@ namespace Inventory.API.Migrations
 
             modelBuilder.Entity("Inventory.API.Models.ProductItem", b =>
                 {
-                    b.HasOne("Inventory.API.Models.Kitchen", null)
+                    b.HasOne("Inventory.API.Models.Kitchen", "Kitchen")
                         .WithMany("ProductItems")
                         .HasForeignKey("KitchenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inventory.API.Models.Kitchen", "Kitchen")
-                        .WithMany()
-                        .HasForeignKey("KitchenId1")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inventory.API.Models.Product", null)
-                        .WithMany("ProductItems")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("Inventory.API.Models.Product", "Product")
-                        .WithMany()
-                        .HasForeignKey("ProductId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .WithMany("ProductItems")
+                        .HasForeignKey("ProductId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Kitchen");
@@ -250,16 +212,10 @@ namespace Inventory.API.Migrations
 
             modelBuilder.Entity("Inventory.API.Models.UserKitchen", b =>
                 {
-                    b.HasOne("Inventory.API.Models.Kitchen", null)
+                    b.HasOne("Inventory.API.Models.Kitchen", "Kitchen")
                         .WithMany("UserKitchens")
                         .HasForeignKey("KitchenId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("Inventory.API.Models.Kitchen", "Kitchen")
-                        .WithMany()
-                        .HasForeignKey("KitchenId1")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Kitchen");

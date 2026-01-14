@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace Inventory.API.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class Initial : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -46,7 +46,6 @@ namespace Inventory.API.Migrations
                     BarCode = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Description = table.Column<string>(type: "nvarchar(1000)", maxLength: 1000, nullable: false),
                     CategoryId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    CategoryId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Scope = table.Column<int>(type: "int", nullable: false),
                     CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     DefaultUnit = table.Column<int>(type: "int", nullable: false)
@@ -59,13 +58,7 @@ namespace Inventory.API.Migrations
                         column: x => x.CategoryId,
                         principalTable: "Category",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_Product_Category_CategoryId1",
-                        column: x => x.CategoryId1,
-                        principalTable: "Category",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -75,8 +68,7 @@ namespace Inventory.API.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Role = table.Column<int>(type: "int", nullable: false),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    KitchenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    KitchenId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    KitchenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -86,13 +78,7 @@ namespace Inventory.API.Migrations
                         column: x => x.KitchenId,
                         principalTable: "Kitchen",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_UserKitchen_Kitchen_KitchenId1",
-                        column: x => x.KitchenId1,
-                        principalTable: "Kitchen",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateTable(
@@ -102,15 +88,13 @@ namespace Inventory.API.Migrations
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Quantity = table.Column<int>(type: "int", maxLength: 200, nullable: false),
                     ProductId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    ProductId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
                     PurchaseDate = table.Column<DateOnly>(type: "date", nullable: false),
                     ExpirationDate = table.Column<DateOnly>(type: "date", nullable: false),
                     Unit = table.Column<int>(type: "int", nullable: false),
                     AddedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     AddedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    KitchenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    KitchenId1 = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    KitchenId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -120,25 +104,13 @@ namespace Inventory.API.Migrations
                         column: x => x.KitchenId,
                         principalTable: "Kitchen",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductItem_Kitchen_KitchenId1",
-                        column: x => x.KitchenId1,
-                        principalTable: "Kitchen",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_ProductItem_Product_ProductId",
                         column: x => x.ProductId,
                         principalTable: "Product",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_ProductItem_Product_ProductId1",
-                        column: x => x.ProductId1,
-                        principalTable: "Product",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
 
             migrationBuilder.CreateIndex(
@@ -147,19 +119,9 @@ namespace Inventory.API.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Product_CategoryId1",
-                table: "Product",
-                column: "CategoryId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_ProductItem_KitchenId",
                 table: "ProductItem",
                 column: "KitchenId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_ProductItem_KitchenId1",
-                table: "ProductItem",
-                column: "KitchenId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_ProductItem_ProductId",
@@ -167,19 +129,9 @@ namespace Inventory.API.Migrations
                 column: "ProductId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_ProductItem_ProductId1",
-                table: "ProductItem",
-                column: "ProductId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_UserKitchen_KitchenId",
                 table: "UserKitchen",
                 column: "KitchenId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_UserKitchen_KitchenId1",
-                table: "UserKitchen",
-                column: "KitchenId1");
 
             migrationBuilder.CreateIndex(
                 name: "IX_UserKitchen_UserId",

@@ -12,11 +12,6 @@ namespace Inventory.API.Controllers
     [Authorize]
     public class ProductController(IProductService productService) : ControllerBase
     {
-        private string GetCurrentUserId()
-        {
-            return User.FindFirstValue(ClaimTypes.NameIdentifier) ?? "testing-userId";
-        }
-
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ProductResponseDTO>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetProducts([FromQuery] string? search, [FromQuery] int limit = 10)
@@ -39,9 +34,7 @@ namespace Inventory.API.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateProductRequest([FromBody] CreateProductRequestDto productDto)
         {
-            var userId = GetCurrentUserId();
-            //first created with Scope = private: visible only for this user
-            var newProductDto = await productService.CreateProduct(productDto, userId);
+            var newProductDto = await productService.CreateProduct(productDto);
 
             return CreatedAtAction(nameof(GetProduct), new { productId = newProductDto.Id }, newProductDto);
         }

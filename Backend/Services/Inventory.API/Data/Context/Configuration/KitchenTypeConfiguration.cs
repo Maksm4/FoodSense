@@ -16,15 +16,16 @@ namespace Inventory.API.Data.Context.Configuration
             builder.Property(k => k.CreatedDate).IsRequired();
 
             builder.HasMany(k => k.ProductItems)
-                .WithOne()
+                .WithOne(pi => pi.Kitchen)
                 .HasForeignKey(pi => pi.KitchenId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             builder.HasMany(k => k.UserKitchens)
-                .WithOne()
+                .WithOne(pi => pi.Kitchen)
                 .HasForeignKey(uk => uk.KitchenId)
-                .IsRequired();
-
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

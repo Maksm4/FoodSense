@@ -46,12 +46,14 @@ namespace Inventory.API.Services
             return product == null ? null : mapper.Map<ProductResponseDTO>(product);
         }
 
-        public async Task<ProductResponseDTO> CreateProduct(CreateProductRequestDto? productDto, string? userId)
+        public async Task<ProductResponseDTO> CreateProduct(CreateProductRequestDto? productDto)
         {
             if (productDto == null)
             {
                 throw new ArgumentNullException(nameof(productDto), "Product data is required");
             }
+            var userId = currentUser.UserId;
+            
             if (string.IsNullOrEmpty(userId))
             {
                 throw new ArgumentException("User ID is required", nameof(userId));

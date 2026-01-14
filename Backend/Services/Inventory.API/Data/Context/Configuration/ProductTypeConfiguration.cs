@@ -20,9 +20,10 @@ namespace Inventory.API.Data.Context.Configuration
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
 
             builder.HasMany(p => p.ProductItems)
-                .WithOne()
+                .WithOne(pi => pi.Product)
                 .HasForeignKey(pi => pi.ProductId)
-                .IsRequired();
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
         }
     }
 }

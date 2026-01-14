@@ -1,3 +1,14 @@
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mssql-data-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 2Gi
+---
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -12,6 +23,11 @@ spec:
       labels:
         app: sql-server
     spec:
+      volumes:
+        - name: mssql-data-volume
+          persistentVolumeClaim:
+            claimName: mssql-data-claim
+      
       containers:
       - name: sql-server
         image: mcr.microsoft.com/mssql/server:2022-latest
@@ -25,7 +41,12 @@ spec:
                 key: sa-password
         ports:
         - containerPort: 1433
+        
+        volumeMounts:
+        - name: mssql-data-volume
+          mountPath: /var/opt/mssql
 ---
+
 apiVersion: v1
 kind: Service
 metadata:
