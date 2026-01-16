@@ -6,7 +6,14 @@ using Microsoft.IdentityModel.Tokens;
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddOpenApi();
-builder.Services.AddReverseProxy().LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
+
+builder.Configuration
+    .AddJsonFile("yarp/yarp.auth.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("yarp/yarp.inventory.json", optional: false, reloadOnChange: true)
+    .AddEnvironmentVariables();
+
+builder.Services.AddReverseProxy()
+    .LoadFromConfig(builder.Configuration.GetSection("ReverseProxy"));
 
 var secretKey = builder.Configuration["JwtSettings:SecretKey"];
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -32,10 +39,8 @@ builder.Services.AddRateLimiter(options =>
     });
 });
 
-builder.Services.AddAuthorization(opt =>
-    {
-        opt.AddPolicy("DefaultPolicy", policy => policy.RequireAuthenticatedUser());
-    });
+builder.Services.AddAuthorizationBuilder()
+    .AddPolicy("DefaultPolicy", policy => policy.RequireAuthenticatedUser());
 
 var app = builder.Build();
 

@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend-inventory-depl
+  name: inventory-api-depl
 spec:
   replicas: 1
   selector:
@@ -15,7 +15,7 @@ spec:
       initContainers:
         - name: wait-for-sql
           image: busybox
-          command: ['sh', '-c', "until nc -z sql-server-service 1433; do echo waiting for sql; sleep 2; done"]
+          command: ['sh', '-c', "until nc -z sql-server-svc 1433; do echo waiting for sql; sleep 2; done"]
       containers:
         - name: inventory-api
           image: maksm4/inventoryapi:latest

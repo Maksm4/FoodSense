@@ -62,7 +62,7 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); for now disable
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();

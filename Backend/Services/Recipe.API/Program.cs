@@ -1,41 +1,75 @@
-var builder = WebApplication.CreateBuilder(args);
+using System.Text;
+using Common.Middlewares;
+using Common.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
+using Recipe.API.Data.Context;
 
-// Add services to the container.
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
+var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
+builder.Services.AddDbContext<RecipeDbContext>(
+        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    );
+
+//services
+
+//repositories
+
+//Common
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICurrentUser, HeaderCurrentUser>();
+
+builder.Services.AddControllers();
+
+builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
+
+
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)), 
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+app.UseExceptionHandler(opt => { });
 if (app.Environment.IsDevelopment())
-{
+{ 
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// app.UseHttpsRedirection(); for now disable
+app.UseAuthentication();
+app.UseAuthorization();
+app.MapControllers();
 
-var summaries = new[]
+using (var scope = app.Services.CreateScope())
 {
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast =  Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-})
-.WithName("GetWeatherForecast");
-
-app.Run();
-
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<RecipeDbContext>(); 
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database");
+    }
 }
+app.Run();

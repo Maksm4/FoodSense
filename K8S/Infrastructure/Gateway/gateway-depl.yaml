@@ -26,7 +26,7 @@ spec:
               key: jwt-key
               
         - name: ReverseProxy__Clusters__AuthAPICluster__Destinations__AuthAPIDestination__Address
-          value: "http://auth-srv:80"
+          value: "http://auth-svc:80"
 
         - name: ReverseProxy__Clusters__InventoryAPICluster__Destinations__InventoryAPIDestination__Address
-          value: "http://node-port-srv:80"
+          value: "http://inventory-svc:80"

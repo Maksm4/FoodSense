@@ -1,0 +1,23 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "LoginRoute": {
+        "ClusterId": "AuthAPICluster",
+        "Match": { "Path": "/api/login" },
+        "Transforms": [ { "PathPattern": "/api/auth/login" } ]
+      },
+      "RegisterRoute": {
+        "ClusterId": "AuthAPICluster",
+        "Match": { "Path": "/api/register" },
+        "Transforms": [ { "PathPattern": "/api/auth/register" } ]
+      }
+    },
+    "Clusters": {
+      "AuthAPICluster": {
+        "Destinations": {
+          "AuthAPIDestination": { "Address": "K8S_OVERRIDES" }
+        }
+      }
+    }
+  }
+}

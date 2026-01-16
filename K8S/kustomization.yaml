@@ -1,0 +1,16 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+resources:
+  - Infrastructure/Database/sql-server-storage.yaml
+  - Infrastructure/Database/sql-server-depl.yaml
+  - Infrastructure/Database/sql-server-svc.yaml
+
+  - Infrastructure/Gateway/gateway-depl.yaml
+  - Infrastructure/Gateway/gateway-svc.yaml
+
+  - Auth/auth-depl.yaml
+  - Auth/auth-svc.yaml
+
+  - Inventory/inventory-depl.yaml
+  - Inventory/inventory-svc.yaml

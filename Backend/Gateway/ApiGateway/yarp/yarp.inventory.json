@@ -1,0 +1,29 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "KitchensRoute": {
+        "ClusterId": "InventoryAPICluster",
+        "AuthorizationPolicy": "DefaultPolicy",
+        "Match": { "Path": "/api/kitchens/{**remainder}" },
+        "Transforms": [ { "PathPattern": "/api/inventory/kitchens/{remainder}" } ]
+      },
+      "ProductsRoute": {
+        "ClusterId": "InventoryAPICluster",
+        "AuthorizationPolicy": "DefaultPolicy",
+        "Match": {
+          "Path": "/api/products/{**remainder}"
+        },
+        "Transforms": [
+          { "PathPattern": "/api/inventory/products/{remainder}" }
+        ]
+      }
+    },
+    "Clusters": {
+      "InventoryAPICluster": {
+        "Destinations": {
+          "InventoryAPIDestination": { "Address": "K8S_OVERRIDES" }
+        }
+      }
+    }
+  }
+}
