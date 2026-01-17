@@ -4,18 +4,21 @@ using Common.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Recipe.API.Config;
 using Recipe.API.Data.Context;
+using Recipe.API.ExternalAPIs;
+using Recipe.API.ExternalAPIs.Edamam.V2;
+using Recipe.API.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
-builder.Services.AddDbContext<RecipeDbContext>(
-        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
+// builder.Services.AddDbContext<RecipeDbContext>(
+//         opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+//     );
 
 //services
-
-//repositories
+builder.Services.AddScoped<IRecipeService, RecipeService>();
 
 //Common
 builder.Services.AddHttpContextAccessor();
@@ -25,23 +28,34 @@ builder.Services.AddControllers();
 
 builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
 
+// builder.Services.AddAuthentication(options =>
+//     {
+//         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+//         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+//     })
+//     .AddJwtBearer(options =>
+//     {
+//         options.TokenValidationParameters = new TokenValidationParameters
+//         {
+//             ValidateIssuerSigningKey = true,
+//             IssuerSigningKey = new SymmetricSecurityKey(
+//                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)), 
+//             ValidateIssuer = false,
+//             ValidateAudience = false
+//         };
+//     });
 
-builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)), 
-            ValidateIssuer = false,
-            ValidateAudience = false
-        };
-    });
+builder.Services.Configure<EdamamSettings>(
+    builder.Configuration.GetSection(EdamamSettings.SectionName));
+
+builder.Services.AddHttpClient<IRecipeProvider, EdamamRecipeProvider>(client =>
+{
+    client.BaseAddress = new Uri("https://api.edamam.com");
+    client.DefaultRequestHeaders.Add("Accept", "application/json");
+    client.DefaultRequestHeaders.Add("Edamam-Account-User", "test-user"); //for now test user
+});
+
+builder.Services.AddAutoMapper(_ => { }, typeof(Program));
 var app = builder.Build();
 
 app.UseExceptionHandler(opt => { });
@@ -51,25 +65,8 @@ if (app.Environment.IsDevelopment())
 }
 
 // app.UseHttpsRedirection(); for now disable
-app.UseAuthentication();
-app.UseAuthorization();
+// app.UseAuthentication();
+// app.UseAuthorization();
 app.MapControllers();
 
-using (var scope = app.Services.CreateScope())
-{
-    var services = scope.ServiceProvider;
-    try
-    {
-        var context = services.GetRequiredService<RecipeDbContext>(); 
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            context.Database.Migrate();
-        }
-    }
-    catch (Exception ex)
-    {
-        var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database");
-    }
-}
 app.Run();
