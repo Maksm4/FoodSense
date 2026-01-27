@@ -1,6 +1,7 @@
 ﻿using System.Security.Claims;
 using Inventory.API.DTOs.Request;
 using Inventory.API.DTOs.Response;
+using Inventory.API.Models;
 using Inventory.API.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -25,9 +26,10 @@ namespace Inventory.API.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(IEnumerable<ProductItemResponseDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<IActionResult> GetProductItems([FromRoute] Guid kitchenId)
+        public async Task<IActionResult> GetProductItems([FromRoute] Guid kitchenId, [FromQuery] KitchenSortStrategy sort = KitchenSortStrategy.ExpirationDate,
+            [FromQuery] bool asc = true)
         {
-            var items = await productItemService.GetItemsFromKitchen(kitchenId);
+            var items = await productItemService.GetItemsFromKitchen(kitchenId, sort, asc);
             return Ok(items);
         }
 

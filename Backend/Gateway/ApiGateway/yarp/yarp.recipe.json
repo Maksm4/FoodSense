@@ -1,0 +1,19 @@
+{
+  "ReverseProxy": {
+    "Routes": {
+      "RecipesRoute": {
+        "ClusterId": "RecipesAPICluster",
+        "AuthorizationPolicy": "DefaultPolicy",
+        "Match": { "Path": "/api/recipes/{**remainder}" },
+        "Transforms": [ { "PathPattern": "/api/recipes/{remainder}" } ]
+      }
+    },
+    "Clusters": {
+      "RecipesAPICluster": {
+        "Destinations": {
+          "RecipesAPIDestionation": { "Address": "K8S_OVERRIDES" }
+        }
+      }
+    }
+  }
+}

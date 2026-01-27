@@ -15,4 +15,12 @@
         Private,
         Pending
     }
+    
+    public enum KitchenSortStrategy
+    {
+        ExpirationDate,
+        Quantity,
+        Name,
+        AddedDate
+    }
 }

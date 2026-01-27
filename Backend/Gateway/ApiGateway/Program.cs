@@ -10,6 +10,7 @@ builder.Services.AddOpenApi();
 builder.Configuration
     .AddJsonFile("yarp/yarp.auth.json", optional: false, reloadOnChange: true)
     .AddJsonFile("yarp/yarp.inventory.json", optional: false, reloadOnChange: true)
+    .AddJsonFile("yarp/yarp.recipe.json", optional: false, reloadOnChange: true)
     .AddEnvironmentVariables();
 
 builder.Services.AddReverseProxy()

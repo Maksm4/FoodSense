@@ -32,12 +32,17 @@ namespace Inventory.API.Services
             return mapper.Map<ProductItemResponseDTO>(productItem);
         }
 
-        public async Task<IEnumerable<ProductItemResponseDTO>> GetItemsFromKitchen(Guid? kitchenId)
+        public async Task<IEnumerable<ProductItemResponseDTO>> GetItemsFromKitchen(Guid? kitchenId, KitchenSortStrategy sortStrategy, bool ascending)
         {
+            if (kitchenId == null || kitchenId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(kitchenId), "Kitchen ID is required");
+            }
+            
             var userId = currentUser.UserId;
             await UserHasAccessToKitchen(kitchenId, userId);
 
-            var productItems = await productItemRepository.GetAllProductItems(kitchenId.Value);
+            var productItems = await productItemRepository.GetAllProductItems(kitchenId.Value, sortStrategy, ascending);
             return mapper.Map<IEnumerable<ProductItemResponseDTO>>(productItems);
         }
 

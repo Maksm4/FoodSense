@@ -21,6 +21,6 @@ spec:
         pathType: ImplementationSpecific
         backend:
           service:
-            name: client-svc
+            name: client-svc #
             port:
               number: 80
