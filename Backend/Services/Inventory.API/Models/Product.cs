@@ -8,10 +8,9 @@ namespace Inventory.API.Models
         public string Name { get; set; } = string.Empty;
         public string Brand { get; set; } = string.Empty;
         public string BarCode { get; set; } = string.Empty;
-        public string Description { get; set; } = string.Empty;
-        public Guid CategoryId { get; set; }
-        public Category Category { get; set; }
-        //public string VisualRepresentation base64 ?
+
+        public IEnumerable<Category> Categories { get; set; } = [];
+        public string VisualRepresentation { get; set; } = string.Empty;
         public ProductScope Scope { get; set; } = ProductScope.Private;
         public string CreatedBy { get; set; } = string.Empty;
         public IEnumerable<ProductItem> ProductItems { get; set;  } = [];

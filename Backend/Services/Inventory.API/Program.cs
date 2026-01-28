@@ -2,6 +2,7 @@ using System.Text;
 using Common.Middlewares;
 using Common.Services;
 using Inventory.API.Data.Context;
+using Inventory.API.Data.Context.Data;
 using Inventory.API.Data.Interfaces;
 using Inventory.API.Data.Repository;
 using Inventory.API.MapperProfiles;
@@ -55,6 +56,14 @@ builder.Services.AddAuthentication(options =>
         };
     });
 var app = builder.Build();
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+    
+    context.Database.EnsureCreated(); 
+    DataSeeder.Seed(context);
+}
 
 app.UseExceptionHandler(opt => { });
 if (app.Environment.IsDevelopment())

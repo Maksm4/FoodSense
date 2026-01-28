@@ -28,22 +28,22 @@ builder.Services.AddControllers();
 
 builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
 
-// builder.Services.AddAuthentication(options =>
-//     {
-//         options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-//         options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-//     })
-//     .AddJwtBearer(options =>
-//     {
-//         options.TokenValidationParameters = new TokenValidationParameters
-//         {
-//             ValidateIssuerSigningKey = true,
-//             IssuerSigningKey = new SymmetricSecurityKey(
-//                 Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)), 
-//             ValidateIssuer = false,
-//             ValidateAudience = false
-//         };
-//     });
+builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(builder.Configuration["JwtSettings:SecretKey"]!)), 
+            ValidateIssuer = false,
+            ValidateAudience = false
+        };
+    });
 
 builder.Services.Configure<EdamamSettings>(
     builder.Configuration.GetSection(EdamamSettings.SectionName));
@@ -64,9 +64,9 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-// app.UseHttpsRedirection(); for now disable
-// app.UseAuthentication();
-// app.UseAuthorization();
+// app.UseHttpsRedirection(); for now disabled
+app.UseAuthentication();
+app.UseAuthorization();
 app.MapControllers();
 
 app.Run();

@@ -24,5 +24,10 @@ namespace Inventory.API.Data.Context
             modelBuilder.ApplyConfiguration(new UserKitchensTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ProductItemTypeConfiguration());
         }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            
+        }
     }
 }

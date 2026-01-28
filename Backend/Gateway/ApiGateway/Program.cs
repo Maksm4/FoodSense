@@ -43,6 +43,16 @@ builder.Services.AddRateLimiter(options =>
 builder.Services.AddAuthorizationBuilder()
     .AddPolicy("DefaultPolicy", policy => policy.RequireAuthenticatedUser());
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+            .AllowAnyMethod()
+            .AllowAnyHeader();
+    });
+});
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
@@ -54,5 +64,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRateLimiter();
+app.UseCors("AllowFrontend");
 app.MapReverseProxy();
 app.Run();

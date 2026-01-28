@@ -27,7 +27,7 @@ public class TokenService(IConfiguration configuration) : ITokenService
             issuer: "https://Auth.API",
             audience: null,
             claims: claims,
-            expires: DateTime.UtcNow.AddMinutes(10),
+            expires: DateTime.UtcNow.AddMinutes(40), //for testing purpose set to 40 minutes
             signingCredentials: credentials
         );
         
