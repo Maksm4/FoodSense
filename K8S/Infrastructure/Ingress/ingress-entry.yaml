@@ -3,24 +3,18 @@ kind: Ingress
 metadata:
   name: ingress-entry
   annotations:
-    nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/use-regex: "true"
 spec:
   ingressClassName: nginx
   rules:
   - host: foodsense.local
     http:
       paths:
+      # ONLY routing API traffic to the cluster
       - path: /api/.*
         pathType: ImplementationSpecific
         backend:
           service:
             name: gateway-svc
-            port:
-              number: 80
-      - path: /?(.*)
-        pathType: ImplementationSpecific
-        backend:
-          service:
-            name: client-svc #
             port:
               number: 80

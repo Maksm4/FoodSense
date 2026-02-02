@@ -2,9 +2,9 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - Infrastructure/Database/sql-server-storage.yaml
-  - Infrastructure/Database/sql-server-depl.yaml
-  - Infrastructure/Database/sql-server-svc.yaml
+  - Infrastructure/Database/SqlServer/sql-server-storage.yaml
+  - Infrastructure/Database/SqlServer/sql-server-depl.yaml
+  - Infrastructure/Database/SqlServer/sql-server-svc.yaml
 
   - Infrastructure/Gateway/gateway-depl.yaml
   - Infrastructure/Gateway/gateway-svc.yaml
