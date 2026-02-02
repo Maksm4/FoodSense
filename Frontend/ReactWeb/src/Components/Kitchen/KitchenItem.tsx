@@ -46,7 +46,7 @@ export default function KitchenItem({ingredient, onClick, onHold, mode, isSelect
 
      return (
     <div 
-      className={`flex rounded overflow-hidden border cursor-pointer ${isSelected ? 'ring-2 ring-blue-800' : ''}`}
+      className={`flex rounded overflow-hidden border cursor-pointer ${isSelected ? 'ring-2 bg-selection' : ''}`}
       onTouchStart={handleTouchStart}
       onTouchEnd={handleTouchEnd}
       onMouseDown={handleTouchStart}
@@ -54,7 +54,7 @@ export default function KitchenItem({ingredient, onClick, onHold, mode, isSelect
       onMouseLeave={handleTouchEnd}
       onClick={handleClick}
     >
-      <div className={`flex-4 p-4 ${isSelected ? 'bg-blue-200' : ' bg-white'}`}>
+      <div className={`flex-4 p-4 ${isSelected ? 'bg-selection-bg' : ' bg-white'}`}>
         <div>
           <p>{ingredient.name}</p>
         </div>
@@ -81,11 +81,11 @@ function getStatusColor(days: number) {
     const status = getExpiryStatus(days);
     switch (status) {
     case "danger":
-        return "bg-[#E07A5F]";
+        return "bg-danger";
     case "medium":
-        return "bg-[#F4A261]";
+        return "bg-medium";
     case "safe":
-        return "bg-[#81B29A]";
+        return "bg-safe";
     default:
         return "bg-gray-400";
     }

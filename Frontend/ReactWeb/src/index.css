@@ -1,1 +1,26 @@
 @import "tailwindcss";
+
+@theme {
+  /* Expiry status colors */
+  --color-danger: #E07A5F;
+  --color-medium: #F4A261;
+  --color-safe: #81B29A;
+  
+  /* Primary actions */
+  --color-primary: #6A994E;
+  --color-primary-hover: #5A8A3E;
+  
+  /* Backgrounds */
+  --color-bg-secondary: #F8F9FA;
+  
+  /* Selection */
+  --color-selection: #6A994E;
+  --color-selection-bg: #E8F5E9;
+  
+  /* Neutral */
+  --color-cancel: #E8E8E8;
+  --color-cancel-hover: #D8D8D8;
+
+  --color-cancel-danger: #e26846;
+  --color-cancel-danger-hover: #963e26;
+}
