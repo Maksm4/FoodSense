@@ -47,9 +47,10 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://localhost:3000", "http://localhost:5173")
+        policy.WithOrigins("http://foodsense.local", "http://localhost:5173", "http://192.168.0.241:5173")
             .AllowAnyMethod()
-            .AllowAnyHeader();
+            .AllowAnyHeader()
+            .AllowCredentials();
     });
 });
 
@@ -59,11 +60,10 @@ if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
 }
-
+app.UseCors("AllowFrontend");
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.UseRateLimiter();
-app.UseCors("AllowFrontend");
 app.MapReverseProxy();
 app.Run();

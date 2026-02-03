@@ -14,3 +14,5 @@ resources:
 
   - Inventory/inventory-depl.yaml
   - Inventory/inventory-svc.yaml
+
+  - Infrastructure/Ingress/ingress-entry.yaml
