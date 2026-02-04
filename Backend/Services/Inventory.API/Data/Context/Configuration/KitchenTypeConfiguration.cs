@@ -19,13 +19,13 @@ namespace Inventory.API.Data.Context.Configuration
                 .WithOne(pi => pi.Kitchen)
                 .HasForeignKey(pi => pi.KitchenId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasMany(k => k.UserKitchens)
                 .WithOne(pi => pi.Kitchen)
                 .HasForeignKey(uk => uk.KitchenId)
                 .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

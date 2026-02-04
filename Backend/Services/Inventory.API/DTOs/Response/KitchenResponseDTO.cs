@@ -8,6 +8,6 @@ namespace Inventory.API.DTOs.Response
         public string Name { get; set; } = string.Empty;
         public DateTime CreatedDate { get; set; }
         public IEnumerable<ProductItemResponseDTO> ProductItems { get; set; } = [];
-        public IEnumerable<Guid> Users { get; set; } = [];
+        public IEnumerable<string> Users { get; set; } = [];
     }
 }

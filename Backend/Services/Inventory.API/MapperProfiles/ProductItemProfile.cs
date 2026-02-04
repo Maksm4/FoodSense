@@ -9,9 +9,13 @@ public class ProductItemProfile : Profile
 {
     public ProductItemProfile()
     {
-        CreateMap<ProductItem, ProductItemResponseDTO>();
+        CreateMap<ProductItem, ProductItemResponseDTO>()
+            .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+            .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Product.Brand));
+        
         CreateMap<UpdateProductItemDto, ProductItem>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+        
         CreateMap<Product, ProductResponseDTO>();
         CreateMap<CreateProductItemDto, ProductItem>();
         CreateMap<CreateProductRequestDto, Product>();

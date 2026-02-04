@@ -17,6 +17,7 @@ namespace Inventory.API.Data.Context.Configuration
             builder.Property(p => p.ExpirationDate).IsRequired();
             builder.Property(p => p.AddedBy).IsRequired();
             builder.Property(p => p.AddedDate).IsRequired();
+            builder.Property(p => p.ProductSize);
 
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
         }

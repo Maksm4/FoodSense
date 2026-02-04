@@ -4,8 +4,13 @@
       "KitchensRoute": {
         "ClusterId": "InventoryAPICluster",
         "AuthorizationPolicy": "DefaultPolicy",
-        "Match": { "Path": "/api/kitchens/{**remainder}" },
-        "Transforms": [ { "PathPattern": "/api/inventory/kitchens/{remainder}" } ]
+        "Match": {
+          "Path": "/api/kitchens/{**catch-all}"
+        },
+        "Transforms": [
+          { "PathRemovePrefix": "/api/kitchens" },
+          { "PathPrefix": "/api/inventory/kitchens" }
+        ]
       },
       "ProductsRoute": {
         "ClusterId": "InventoryAPICluster",

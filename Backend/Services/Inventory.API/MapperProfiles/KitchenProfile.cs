@@ -12,7 +12,7 @@ namespace Inventory.API.MapperProfiles
             CreateMap<CreateKitchenDto, Kitchen>();
             CreateMap<Kitchen, KitchenResponseDTO>()
                 .ForMember(dest => dest.Users, opt => opt.MapFrom(src => 
-                        src.UserKitchens.Select(uk => uk.UserId)
+                        src.UserKitchens.Select(uk => uk.UserId) //change it to username
                 ));
         }
     }

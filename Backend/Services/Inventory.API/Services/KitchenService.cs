@@ -30,7 +30,7 @@ namespace Inventory.API.Services
                 UserId = userId,
                 Role = UserKitchenRole.Owner,
                 Kitchen = kitchenEntity,
-                KitchenId = kitchenEntity.Id
+                KitchenId = kitchenEntity.Id,
             });
 
             await kitchenRepository.Add(kitchenEntity);
