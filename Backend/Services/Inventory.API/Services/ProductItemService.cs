@@ -84,7 +84,28 @@ namespace Inventory.API.Services
             productItemRepository.Delete(productItem);
             await productItemRepository.SaveChanges();
         }
-        
+
+        public async Task<ProductItemResponseDTO> UpdateItemInKitchen(Guid? kitchenId, Guid? itemId, UpdateProductItemDto updateDto)
+        {
+            if (itemId == null || itemId == Guid.Empty)
+            {
+                throw new ArgumentNullException(nameof(itemId), "Item is required");
+            }
+            var userId = currentUser.UserId;
+            await UserHasAccessToKitchen(kitchenId, userId);
+            var existingItem = await productItemRepository.GetItemFromKitchen(kitchenId!.Value, itemId.Value);
+            
+            if (existingItem == null)
+            {
+                throw new NotFoundException("Product item not found in the specified kitchen");
+            }
+            mapper.Map(updateDto, existingItem);
+
+            await productItemRepository.SaveChanges();
+            return mapper.Map<ProductItemResponseDTO>(existingItem);
+            
+        }
+
         private async Task UserHasAccessToKitchen(Guid? kitchenId, string? userId)
         {
             if (kitchenId == null || kitchenId == Guid.Empty)

@@ -35,7 +35,7 @@ builder.Services.AddScoped<ICurrentUser, HeaderCurrentUser>();
 
 builder.Services.AddControllers();
 
-builder.Services.AddAutoMapper(cfg => { }, typeof(KitchenProfile));
+builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
 
 
@@ -56,14 +56,6 @@ builder.Services.AddAuthentication(options =>
         };
     });
 var app = builder.Build();
-
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
-    
-    context.Database.EnsureCreated(); 
-    DataSeeder.Seed(context);
-}
 
 app.UseExceptionHandler(opt => { });
 if (app.Environment.IsDevelopment())
@@ -92,5 +84,13 @@ using (var scope = app.Services.CreateScope())
         var logger = services.GetRequiredService<ILogger<Program>>();
         logger.LogError(ex, "An error occurred while migrating the database");
     }
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var context = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
+    
+    context.Database.EnsureCreated(); 
+    DataSeeder.Seed(context);
 }
 app.Run();

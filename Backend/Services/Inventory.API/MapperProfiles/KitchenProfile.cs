@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using Inventory.API.DTOs.Request;
+using Inventory.API.DTOs.Response;
 using Inventory.API.Models;
 
 namespace Inventory.API.MapperProfiles
@@ -9,6 +10,10 @@ namespace Inventory.API.MapperProfiles
         public KitchenProfile()
         {
             CreateMap<CreateKitchenDto, Kitchen>();
+            CreateMap<Kitchen, KitchenResponseDTO>()
+                .ForMember(dest => dest.Users, opt => opt.MapFrom(src => 
+                        src.UserKitchens.Select(uk => uk.UserId)
+                ));
         }
     }
 }

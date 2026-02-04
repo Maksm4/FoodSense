@@ -9,11 +9,11 @@ namespace Inventory.API.Models
         public string Brand { get; set; } = string.Empty;
         public string BarCode { get; set; } = string.Empty;
 
-        public IEnumerable<Category> Categories { get; set; } = [];
+        public ICollection<Category> Categories { get; set; } = new List<Category>();
         public string VisualRepresentation { get; set; } = string.Empty;
         public ProductScope Scope { get; set; } = ProductScope.Private;
         public string CreatedBy { get; set; } = string.Empty;
-        public IEnumerable<ProductItem> ProductItems { get; set;  } = [];
+        public ICollection<ProductItem> ProductItems { get; set;  } = new List<ProductItem>();
         public Unit DefaultUnit { get; set; }
     }
 }

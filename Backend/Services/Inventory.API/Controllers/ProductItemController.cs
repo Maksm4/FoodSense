@@ -42,6 +42,18 @@ namespace Inventory.API.Controllers
             var createdItem = await productItemService.AddItemToKitchen(kitchenId, itemDto);
             return CreatedAtAction(nameof(GetProductItemById), new { kitchenId }, createdItem);
         }
+        
+        [HttpPatch("{itemId:guid}")]
+        [ProducesResponseType(typeof(ProductItemResponseDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        public async Task<IActionResult> UpdateProductItem([FromRoute] Guid kitchenId, [FromRoute] Guid itemId, 
+            [FromBody] UpdateProductItemDto updateDto)
+        {
+            var updatedItem = await productItemService.UpdateItemInKitchen(kitchenId, itemId, updateDto);
+            return Ok(updatedItem);
+        }
 
         [HttpDelete("{itemId:guid}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
