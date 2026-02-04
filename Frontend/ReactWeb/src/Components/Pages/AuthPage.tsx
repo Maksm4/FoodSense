@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import Login from './Login';
-import Register from './Register';
+import Login from '../Auth/Login';
+import Register from '../Auth/Register';
+import { PageContainer } from '../UI/PageContainer';
 
 type AuthMode = 'login' | 'register';
 
@@ -8,6 +9,7 @@ export default function AuthPage() {
   const [mode, setMode] = useState<AuthMode>('login');
 
   return (
+    <PageContainer>
     <div className="min-h-screen bg-bg-secondary flex items-center justify-center p-4">
       <div className="w-full max-w-md">
         {/* Header */}
@@ -23,7 +25,6 @@ export default function AuthPage() {
 
         {/* Form Container */}
         <div className="bg-white rounded-2xl shadow-lg p-8">
-          {/* Mode Toggle */}
           <div className="flex gap-2 mb-6 bg-bg-secondary rounded-lg p-1">
             <button
               onClick={() => setMode('login')}
@@ -47,10 +48,10 @@ export default function AuthPage() {
             </button>
           </div>
 
-          {/* Forms */}
           {mode === 'login' ? <Login /> : <Register onSuccess={() => setMode('login')} />}
         </div>
       </div>
     </div>
+    </PageContainer>
   );
 }

@@ -1,26 +1,27 @@
-import React from 'react';
-
-interface CardProps {
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
   title: string;
   subtitle?: string;
-  onClick?: () => void;
-  action?: React.ReactNode; 
-  className?: string;
+  action?: React.ReactNode;
+  isSelected?: boolean;
 }
 
-export const Card = ({ title, subtitle, onClick, action, className }: CardProps) => {
+export const Card = ({ title, subtitle, action, isSelected, className, ...props }: CardProps) => {
   return (
     <div 
-      // Only make it look clickable if an onClick is provided
       className={`
-        bg-white border border-gray-200 rounded-xl p-4 shadow-sm 
-        flex justify-between items-center transition-all
-        ${onClick ? 'cursor-pointer hover:shadow-md hover:border-blue-300' : ''}
+        bg-white border rounded-xl p-4 shadow-sm 
+        flex justify-between items-center transition-all duration-200
+        ${props.onClick ? 'cursor-pointer' : ''}
+        
+        /* Logic for Selection State using your variables */
+        ${isSelected 
+            ? 'ring-2 ring-selection bg-selection-bg border-selection' 
+            : 'border-gray-200 hover:border-primary/50'
+        }
         ${className}
       `}
-      onClick={onClick}
+      {...props}
     >
-      {/* Left Side: Text Info */}
       <div className="flex flex-col">
         <h3 className="font-semibold text-gray-900 text-lg">{title}</h3>
         {subtitle && (
@@ -28,12 +29,8 @@ export const Card = ({ title, subtitle, onClick, action, className }: CardProps)
         )}
       </div>
 
-      {/* Right Side: Optional Action (Delete button, Icon, Badge) */}
       {action && (
-        <div 
-          className="ml-4"
-          onClick={(e) => e.stopPropagation()} // Stop the card click from firing when clicking the action
-        >
+        <div className="ml-4" onClick={(e) => e.stopPropagation()}>
           {action}
         </div>
       )}

@@ -2,10 +2,9 @@
 {
     public enum Unit
     {
+        pieces,
         ml,
         L,
-        lb,
-        Oz,
         g,
         kg
     }

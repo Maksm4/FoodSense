@@ -1,8 +1,8 @@
 export interface Ingredient {
-    id: number,
-    name: string,
-    unitCapacity: number,
-    amount: number,
-    unit: string,
-    expiryDate: Date
+    id: string;
+    productName: string;
+    quantity: number;
+    productSize: number;
+    unit: number,
+    expirationDate: Date
 }

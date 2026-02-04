@@ -1,36 +1,84 @@
-import { useState } from "react";
-import { dummyIngredientsData } from "../../Data/dummyIngredientsData";
+import { useCallback, useEffect, useState } from "react";
 import IngredientsToolBox from "../Ingredients/IngredientsToolBox";
 import IngredientsList from "../Ingredients/IngredientsList";
 import SearchBar from "../Ingredients/SearchBar";
 import type { Ingredient } from "../../Data/Ingredient";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Logout from "../Auth/Logout";
+import { PageContainer } from "../UI/PageContainer";
+import { ingredientsService } from "../../api/ingredientsService";
+import { Button } from "../UI/Button";
+import AddItemPopup from "../Ingredients/AddItemPopup";
 
 export default function IngredientsPage() {
+    const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+
     const [mode, setMode] = useState<string>("default"); // default/cooking
-    const [selectedItems, setSelectedItems] = useState<number[]>([]);
+    const [selectedItems, setSelectedItems] = useState<string[]>([]);
+
     const [searchQuery, setSearchQuery] = useState("");
     const navigate = useNavigate();
 
-    const data: Ingredient[] = dummyIngredientsData;
+    const [error, setError] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+    const { kitchenId } = useParams();
+
+    //load kitchens items
+    const loadData = useCallback(async () => {
+        if (!kitchenId) return;
+
+        try {
+            setIsLoading(true);
+            const data = await ingredientsService.getAll(kitchenId);
+            setIngredients(data);
+        } catch (_) {
+            setError("Could not load kitchen inventory.");
+        } finally {
+            setIsLoading(false);
+        }
+    }, [kitchenId]);
+
+    useEffect(() => {
+        loadData();
+    }, [loadData]);
 
     function handleCookModeClick() {
         setMode("cooking");
     }
 
     //to trigger cooking mode 
-    function handleItemHold (id: number) {
+    function handleItemHold (id: string) {
         setMode("cooking");
         setSelectedItems([...selectedItems, id])
     }
 
-    function handleItemClick(id: number) {
+    function handleItemClick(id: string) {
         if (mode !== "cooking") return;
 
         setSelectedItems(prev => 
             prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
         );
+    }
+
+    const handleUpdateQuantity = async (itemId: string, newAmount: number) => {
+        try {
+            if (!kitchenId) return;
+
+            await ingredientsService.updateItem(
+                kitchenId, 
+                itemId.toString(),
+                { amount: newAmount }
+            );
+
+            setIngredients(prevData => prevData.map(item => 
+                item.id === itemId ? { ...item, amount: newAmount } : item
+            ));
+
+        } catch (_) {
+            setError("Failed to update quantity");
+        }
     }
 
     const handleCancelCooking = () => {
@@ -40,7 +88,7 @@ export default function IngredientsPage() {
 
     const handleCook = () => {
         //nav to recipes
-        const selectedIngredients = data.
+        const selectedIngredients = ingredients.
             filter(ingredient => selectedItems.includes(ingredient.id));
 
         navigate('/recipes', {
@@ -48,12 +96,24 @@ export default function IngredientsPage() {
         })
     };
 
-    const filteredIngredients = data.
-        filter(ingredient => ingredient.name.toLowerCase().includes(searchQuery.toLowerCase()));
+    const filteredIngredients = ingredients.
+        filter(ingredient => (ingredient.productName || "").toLowerCase().includes(searchQuery.toLowerCase()));
 
     return (
-        <div className="max-w-4xl mx-auto">
-            <Logout ></Logout>
+        <PageContainer>
+            <div className="flex justify-between items-center mb-4">
+                <Button
+                    variant="secondary"
+                    className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+                    onClick={() => navigate('/kitchens')}
+                >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                    </svg>
+                    Back
+                </Button>
+                <Logout />
+            </div>
             <SearchBar 
                 onSearchChange={setSearchQuery}
                 searchQuery={searchQuery}
@@ -67,12 +127,21 @@ export default function IngredientsPage() {
                 itemsSelected={selectedItems}
                 onItemHold={handleItemHold}
                 onItemClick={handleItemClick}
+                onItemDelete={handleCancelCooking}
+                onItemQuantityChange={handleUpdateQuantity}
             />
             <IngredientsToolBox 
                 mode={mode}
                 onCook={handleCook}
                 onCancel={handleCancelCooking}
+                onAdd={() => setIsAddModalOpen(true)}
             />
-        </div>
+            <AddItemPopup
+                isOpen={isAddModalOpen}
+                onClose={() => setIsAddModalOpen(false)}
+                onAdded={loadData}
+                kitchenId={kitchenId!} 
+            />
+        </PageContainer>
     );
 }

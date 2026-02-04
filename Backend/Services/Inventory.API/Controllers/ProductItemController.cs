@@ -40,7 +40,7 @@ namespace Inventory.API.Controllers
         public async Task<IActionResult> CreateProductItem(Guid kitchenId, [FromBody] CreateProductItemDto itemDto)
         {
             var createdItem = await productItemService.AddItemToKitchen(kitchenId, itemDto);
-            return CreatedAtAction(nameof(GetProductItemById), new { kitchenId, createdItem.Id }, createdItem);
+            return CreatedAtAction(nameof(GetProductItemById), new { kitchenId, itemId = createdItem.Id }, createdItem);
         }
         
         [HttpPatch("{itemId:guid}")]

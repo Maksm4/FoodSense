@@ -2,9 +2,10 @@ interface IngredientsToolBoxProps {
   mode: string;
   onCook: () => void;
   onCancel: () => void;
+  onAdd: () => void;
 }
 
-export default function IngredientsToolBox({mode, onCancel, onCook}: IngredientsToolBoxProps) {
+export default function IngredientsToolBox({mode, onCancel, onCook, onAdd}: IngredientsToolBoxProps) {
   if (mode === "cooking") {
     return (
       <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
@@ -29,7 +30,7 @@ export default function IngredientsToolBox({mode, onCancel, onCook}: Ingredients
   return (
     <div className="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200">
       <div className="flex justify-center">
-        <button className="py-3 px-8 bg-primary text-white rounded-lg font-semibold hover:bg-primary-hover">
+        <button className="py-3 px-8 bg-primary text-white rounded-lg font-semibold hover:bg-primary-hover" onClick={onAdd}>
           + Add Item
         </button>
       </div>

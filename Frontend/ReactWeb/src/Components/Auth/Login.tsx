@@ -33,7 +33,7 @@ export default function Login() {
       const response = await authService.login(formData);
       
       localStorage.setItem('jwt_token', response.token);
-      navigate('/');
+      navigate('/kitchens');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid email or password');
       setIsLoading(false);
