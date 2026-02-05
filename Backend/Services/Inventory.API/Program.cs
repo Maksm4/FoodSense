@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Common.Middlewares;
 using Common.Services;
 using Inventory.API.Data.Context;
@@ -33,11 +34,14 @@ builder.Services.AddScoped<IProductItemRepository, ProductItemRepository>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HeaderCurrentUser>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddAutoMapper(cfg => { }, typeof(Program));
 builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
-
 
 builder.Services.AddAuthentication(options =>
     {

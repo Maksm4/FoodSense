@@ -7,16 +7,12 @@ import { recipeService } from "../../api/recipeService";
 export default function RecipePage() {
     const location = useLocation();
     const navigation = useNavigate();
-    const ingredients = location.state?.ingredients as Ingredient[] || [];
+    const ingredients = location.state?.ingredients as string[] || [];
 
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-
-    useEffect(() => {
-        fetchRecipes();
-    }, []);
 
     const fetchRecipes = async () => {
         try {
@@ -27,7 +23,7 @@ export default function RecipePage() {
                 ingredients: ingredientNames,
             });
 
-            setRecipes(response.recipes);
+            setRecipes(response.items);
             setIsLoading(false);
         } catch (err) {
             setError(err instanceof Error ? err.message : 'Failed to fetch recipes');
@@ -35,6 +31,11 @@ export default function RecipePage() {
         }
     };
 
+        useEffect(() => {
+        fetchRecipes();
+    }, []);
+
+  
     const handleSwipeLeft = () => {
         if (currentIndex < recipes.length - 1) {
             setCurrentIndex(prev => prev + 1);
@@ -49,7 +50,7 @@ export default function RecipePage() {
     };
 
     const handleRecipeClick = (recipe: Recipe) => {
-        window.open(recipe.sourceUrl, '_blank');
+        window.open(recipe.url, '_blank');
     };
 
     if (isLoading) {

@@ -101,7 +101,7 @@ export default function IngredientsPage() {
     const handleCook = () => {
         //nav to recipes
         const selectedIngredients = ingredients.
-            filter(ingredient => selectedItems.includes(ingredient.id));
+            filter(ingredient => selectedItems.includes(ingredient.id)).map(ingr => ingr.name); //TODO: change to main Category instead of name
 
         navigate('/recipes', {
             state: { ingredients: selectedIngredients }
@@ -109,7 +109,7 @@ export default function IngredientsPage() {
     };
 
     const filteredIngredients = ingredients.
-        filter(ingredient => (ingredient.productName || "").toLowerCase().includes(searchQuery.toLowerCase()));
+        filter(ingredient => (ingredient.name || "").toLowerCase().includes(searchQuery.toLowerCase()));
 
     return (
         <PageContainer>

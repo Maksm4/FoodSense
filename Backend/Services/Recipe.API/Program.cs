@@ -1,4 +1,5 @@
 using System.Text;
+using System.Text.Json.Serialization;
 using Common.Middlewares;
 using Common.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -24,7 +25,11 @@ builder.Services.AddScoped<IRecipeService, RecipeService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HeaderCurrentUser>();
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 
 builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
 

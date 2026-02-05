@@ -3,18 +3,37 @@ export const MealType = {
   Lunch: 'Lunch',
   Dinner: 'Dinner',
   Snack: 'Snack',
+  Teatime: 'Teatime',
 } as const;
 
 export type MealType = typeof MealType[keyof typeof MealType];
 
 export const CuisineType = {
-  Italian: 'Italian',
-  Mexican: 'Mexican',
+  American: 'American',
   Asian: 'Asian',
+  British: 'British',
+  Caribbean: 'Caribbean',
+  CentralEurope: 'CentralEurope',
+  Chinese: 'Chinese',
+  EasternEurope: 'EasternEurope',
+  French: 'French',
+  Indian: 'Indian',
+  Italian: 'Italian',
+  Japanese: 'Japanese',
+  Kosher: 'Kosher',
   Mediterranean: 'Mediterranean',
-  American: 'American'
+  Mexican: 'Mexican',
+  MiddleEastern: 'MiddleEastern',
+  Nordic: 'Nordic',
+  SouthAmerican: 'SouthAmerican',
+  SouthEastAsian: 'SouthEastAsian',
+  World: 'World',
+  Polish: 'Polish',
+  Korean: 'Korean',
+  Greek: 'Greek'
 } as const;
 
+// This generates the type: "American" | "Asian" | "British" | ...
 export type CuisineType = typeof CuisineType[keyof typeof CuisineType];
 
 export interface RecipeIngredient {
