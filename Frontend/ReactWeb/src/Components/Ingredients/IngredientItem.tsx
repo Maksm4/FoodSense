@@ -26,7 +26,6 @@ export default function IngredientItem({
     const holdTimerRef = useRef<number>(0);
     const wasHoldRef = useRef(false);
 
-    // --- Date Logic ---
     const getDaysUntilExpiry = () => {
         const today = new Date();
         const expiry = new Date(ingredient.expirationDate);
@@ -65,7 +64,6 @@ export default function IngredientItem({
          wasHoldRef.current = false;
     };
 
-    // --- Quantity Handlers ---
     const handleIncrease = (e: React.MouseEvent) => {
         e.stopPropagation();
         onQuantityChange(ingredient.id, ingredient.quantity + 1);
@@ -75,9 +73,6 @@ export default function IngredientItem({
         e.stopPropagation();
         if (ingredient.quantity > 1) {
             onQuantityChange(ingredient.id, ingredient.quantity - 1);
-        } else {
-            // Optional: If quantity is 1, asking to decrease might mean delete?
-            // For now, we just stop at 1.
         }
     };
 
@@ -86,34 +81,29 @@ export default function IngredientItem({
         onDelete(ingredient.id);
     };
 
-    // --- Display Logic ---
     const getSubtitle = () => {
-        const label = getUnitLabel(ingredient.unit);
+        const label = ingredient.unitLabel;
         if (ingredient.unit === 0) {
             return `${ingredient.quantity} ${label}`;
         }
-        return `${ingredient.quantity} • ${ingredient.productSize} ${label}`;
+        return `${ingredient.quantity} • ${ingredient.size} ${label}`;
     };
 
     return (
         <Card
-            title={ingredient.productName}
+            title={ingredient.name}
             subtitle={getSubtitle()}
             isSelected={isSelected} 
             className="select-none relative"
             
             action={
                 <div className="flex flex-col items-end justify-between h-full min-h-50px gap-2">
-                    {/* Top Right: Expiry Badge */}
                     <Badge 
                         text={`${days} days`} 
                         color={getBadgeColor(days)} 
                     />
 
-                    {/* Bottom Right: Controls */}
                     <div className="flex items-center gap-1 mt-auto">
-                        
-                        {/* Minus Button */}
                         <button 
                             onClick={handleDecrease}
                             disabled={ingredient.quantity <= 1}
@@ -122,7 +112,6 @@ export default function IngredientItem({
                             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
                         </button>
 
-                        {/* Plus Button */}
                         <button 
                             onClick={handleIncrease}
                             className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"

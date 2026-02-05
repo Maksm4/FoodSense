@@ -1,8 +1,11 @@
 export interface Ingredient {
     id: string;
-    productName: string;
+    name: string;
+    brand: string;
     quantity: number;
-    productSize: number;
+    size: number;
     unit: number,
-    expirationDate: Date
+    unitLabel: string;
+    expirationDate: Date;
+    isExpired: boolean;
 }

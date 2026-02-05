@@ -13,21 +13,20 @@ interface AddItemPopupProps {
 }
 
 export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: AddItemPopupProps) {
-    // Search State
+    // Search
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<ProductResponse[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null);
 
-    // Form State
+    // Form
     const [quantity, setQuantity] = useState(1);
     const [productSize, setProductSize] = useState(0);
     const [unit, setUnit] = useState(0);
 
     const [price, setPrice] = useState(0);
     const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
-    const [expirationDate, setExpirationDate] = useState(new Date(Date.now() + 86400000).toISOString().split('T')[0]);
+    const [expirationDate, setExpirationDate] = useState( () => new Date(Date.now() + 86400000).toISOString().split('T')[0]);
     
-    // Search Logic
     useEffect(() => {
         const delayDebounce = setTimeout(async () => {
             if (searchQuery.length >= 1) {
@@ -84,7 +83,7 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
                 
                 <h2 className="text-xl font-bold mb-4">Add New Item</h2>
 
-                {/* --- SECTION 1: SEARCH --- */}
+                {/* SEARCH */}
                 {!selectedProduct ? (
                     <div className="space-y-4">
                         <div>
@@ -124,9 +123,8 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
                     </div>
                 ) : (
                     
-                    /* --- SECTION 2: DETAILS FORM --- */
+                    /* DETAILS FORM */
                     <div className="space-y-4">
-                        {/* Selected Product Header */}
                         <div className="flex justify-between items-center bg-blue-50 p-3 rounded-lg border border-blue-100">
                             <div>
                                 <h3 className="font-bold text-blue-900">{selectedProduct.name}</h3>
@@ -182,7 +180,6 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
                                 </div>
                             </div>
                             
-                            {/* Calculation Helper Text */}
                             <div className="text-xs text-gray-500 mt-1 text-right">
                                 Total Inventory: <strong>{quantity * productSize} {UNITS.find(u => u.id === unit)?.label}</strong>
                             </div>

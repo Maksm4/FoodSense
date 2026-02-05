@@ -1,26 +1,3 @@
-export interface IngredientResponse {
-  name: string;
-  quantity?: number;
-  measure?: string;
-  weight: string;
-}
-
-export interface Recipe {
-  title: string;
-  author: string;
-  imageUrl: string;
-  sourceUrl: string;
-  preparationTime?: number; // in minutes
-  ingredients: IngredientResponse[];
-  calories?: number;
-  healthLabels: string[];
-}
-
-export interface RecipeSearchResponse {
-  recipes: Recipe[];
-  nextPageToken?: string;
-}
-
 export const MealType = {
   Breakfast: 'Breakfast',
   Lunch: 'Lunch',
@@ -40,11 +17,26 @@ export const CuisineType = {
 
 export type CuisineType = typeof CuisineType[keyof typeof CuisineType];
 
-export interface RecipeRequest {
-  ingredients: string[];
-  mealType?: MealType;
-  cuisineType?: CuisineType;
-  minTime?: number;
-  maxTime?: number;
-  nextPageToken?: string;
+export interface RecipeIngredient {
+    text: string;
+    quantity: number; 
+    measure: string;
+    weight: number;
+}
+
+export interface Recipe {
+    id: string; 
+    title: string;
+    author: string;
+    image: string;
+    url: string;
+    time: number;
+    calories: number;
+    tags: string[];
+    ingredients: RecipeIngredient[];
+}
+
+export interface RecipeSearchResult {
+    items: Recipe[];
+    nextPageToken?: string;
 }

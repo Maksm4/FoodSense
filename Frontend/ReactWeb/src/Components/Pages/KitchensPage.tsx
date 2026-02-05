@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { kitchenService, type KitchenRequest } from "../../api/kitchenService";
+import { kitchenService, type KitchenResponse } from "../../api/kitchenService";
 import { PageContainer } from "../UI/PageContainer";
 import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
@@ -10,7 +10,7 @@ import KitchenList from "../Kitchen/KitchenList";
 export default function KitchensPage() {
     const navigate = useNavigate();
 
-    const [kitchens, setKitchens] = useState<KitchenRequest[]>([]);
+    const [kitchens, setKitchens] = useState<KitchenResponse[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     
     const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -60,19 +60,15 @@ export default function KitchensPage() {
         navigate(`/kitchens/${id}`);
     };
 
-    // --- Render ---
     return (
         <PageContainer>
-            {/* Header */}
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">My Kitchens</h1>
-                {/* Only show small add button if we have items (handled by check inside List usually, but kept here for header consistency) */}
                 {kitchens.length > 0 && (
                     <Button onClick={() => setIsCreateOpen(true)}>+ Add New</Button>
                 )}
             </div>
 
-            {/* Main Content */}
             {isLoading ? (
                 <div className="text-center py-10 text-gray-500">Loading your spaces...</div>
             ) : (
@@ -84,9 +80,6 @@ export default function KitchensPage() {
                 />
             )}
 
-            {/* --- Modals --- */}
-            
-            {/* Create Modal */}
             {isCreateOpen && (
                 <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
                     <div className="absolute inset-0 bg-black/40 backdrop-blur-sm" onClick={() => setIsCreateOpen(false)} />
@@ -107,7 +100,6 @@ export default function KitchensPage() {
                 </div>
             )}
 
-            {/* Delete Confirmation */}
             <Popup
                 isOpen={!!kitchenToDelete}
                 title="Delete Kitchen?"

@@ -62,18 +62,30 @@ export default function IngredientsPage() {
         );
     }
 
-    const handleUpdateQuantity = async (itemId: string, newAmount: number) => {
+    async function handleItemDelete(id: string) {
+        if (!kitchenId) return;
+        try 
+        {
+            await ingredientsService.delete(kitchenId, id);
+            setIngredients(prevData => prevData.filter(item => item.id !== id));
+        }catch(_)
+        {
+            setError("Failed to delete item");
+        }
+    }
+
+    async function handleUpdateQuantity(itemId: string, newAmount: number) {
         try {
             if (!kitchenId) return;
 
             await ingredientsService.updateItem(
                 kitchenId, 
-                itemId.toString(),
-                { amount: newAmount }
+                itemId,
+                { quantity: newAmount }
             );
 
             setIngredients(prevData => prevData.map(item => 
-                item.id === itemId ? { ...item, amount: newAmount } : item
+                item.id === itemId ? { ...item, quantity: newAmount } : item
             ));
 
         } catch (_) {
@@ -127,7 +139,7 @@ export default function IngredientsPage() {
                 itemsSelected={selectedItems}
                 onItemHold={handleItemHold}
                 onItemClick={handleItemClick}
-                onItemDelete={handleCancelCooking}
+                onItemDelete={handleItemDelete}
                 onItemQuantityChange={handleUpdateQuantity}
             />
             <IngredientsToolBox 

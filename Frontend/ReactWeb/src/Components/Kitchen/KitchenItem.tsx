@@ -1,9 +1,9 @@
 import { Card } from "../UI/Card";
 import { Button } from "../UI/Button";
-import type { KitchenRequest } from "../../api/kitchenService";
+import type { KitchenResponse } from "../../api/kitchenService";
 
 interface KitchenItemProps {
-    kitchen: KitchenRequest;
+    kitchen: KitchenResponse;
     onClick: (id: string) => void;
     onDelete: (id: string) => void;
 }
