@@ -19,7 +19,7 @@ _Rider*/
 
 # --- Secrets (DO NOT COMMIT!) ---
 appsettings.Development.json
-
+.env
 # --- VS Code ---
 .vscode/*
 !.vscode/settings.json
