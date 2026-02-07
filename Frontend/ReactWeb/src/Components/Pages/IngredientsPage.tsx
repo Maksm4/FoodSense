@@ -101,7 +101,7 @@ export default function IngredientsPage() {
     const handleCook = () => {
         //nav to recipes
         const selectedIngredients = ingredients.
-            filter(ingredient => selectedItems.includes(ingredient.id)).map(ingr => ingr.name); //TODO: change to main Category instead of name
+            filter(ingredient => selectedItems.includes(ingredient.id))
 
         navigate('/recipes', {
             state: { ingredients: selectedIngredients }

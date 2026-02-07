@@ -50,8 +50,8 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.Configure<EdamamSettings>(
-    builder.Configuration.GetSection(EdamamSettings.SectionName));
+builder.Services.Configure<Edamam>(
+    builder.Configuration.GetSection(Edamam.SectionName));
 
 builder.Services.AddHttpClient<IRecipeProvider, EdamamRecipeProvider>(client =>
 {

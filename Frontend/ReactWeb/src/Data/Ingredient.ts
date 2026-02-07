@@ -8,4 +8,5 @@ export interface Ingredient {
     unitLabel: string;
     expirationDate: Date;
     isExpired: boolean;
+    mainCategory: string;
 }

@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: recipe-api-depl
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: recipe-api
+  template:
+    metadata:
+      labels:
+        app: recipe-api
+    spec:
+      containers:
+        - name: recipe-api
+          image: maksm4/recipeapi:latest
+          imagePullPolicy: Never
+          ports:
+            - containerPort: 8080
+          env:
+            - name: JwtSettings__SecretKey
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: jwt-key
+
+            - name: Edamam__AppId
+              valueFrom:
+                secretKeyRef:
+                  name: edamam-secrets
+                  key: EDAMAM__APPID
+
+            - name: Edamam__AppKey
+              valueFrom:
+                secretKeyRef:
+                  name: edamam-secrets
+                  key: EDAMAM__APPKEY

@@ -1,212 +1,253 @@
 import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState, useRef } from "react";
 import type { Ingredient } from "../../Data/Ingredient";
-import { useEffect, useState } from "react";
 import type { Recipe } from "../../Data/Recipe";
 import { recipeService } from "../../api/recipeService";
+import RecipeCard from "../Recipe/RecipeCard";
 
 export default function RecipePage() {
     const location = useLocation();
-    const navigation = useNavigate();
-    const ingredients = location.state?.ingredients as string[] || [];
+    const navigate = useNavigate();
+    const ingredients = (location.state?.ingredients as Ingredient[]) || [];
 
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [nextPageToken, setNextPageToken] = useState<string | null>(null);
+    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    const fetchRecipes = async () => {
+    const lastFetchedToken = useRef<string | null>(null);
+
+    const getSearchTerms = () => {
+        const categories = ingredients
+            .map(i => i.mainCategory)
+            .filter(c => c && c.trim() !== "")
+            .map(c => c.replace(/^en:/, '')); 
+        
+        return [...new Set(categories)];
+    };
+
+    useEffect(() => {
+        async function fetchData() {
+            const searchTerms = getSearchTerms();
+
+            if (searchTerms.length === 0) {
+                setIsLoading(false);
+                return;
+            }
+
+            try {
+                setIsLoading(true);
+                const response = await recipeService.searchRecipes({
+                    ingredients: searchTerms
+                });
+
+                setRecipes(response.items || []);
+                setNextPageToken(response.nextPageToken || null);
+                setIsLoading(false);
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Failed to fetch recipes');
+                setIsLoading(false);
+            }
+        } 
+        fetchData();
+    }, []); 
+
+    const loadMoreRecipes = async () => {
+        if (!nextPageToken || isLoadingMore) return;
+        if (lastFetchedToken.current === nextPageToken) return;
+
         try {
-            setIsLoading(true);
+            console.log("Fetching more recipes...");
+            setIsLoadingMore(true);
+            lastFetchedToken.current = nextPageToken;
 
-            const ingredientNames = ingredients.map(i => i.name);
+            const searchTerms = getSearchTerms();
+
             const response = await recipeService.searchRecipes({
-                ingredients: ingredientNames,
+                ingredients: searchTerms,
+                nextPageToken: nextPageToken
             });
 
-            setRecipes(response.items);
-            setIsLoading(false);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Failed to fetch recipes');
-            setIsLoading(false);
+            setRecipes(prev => [...prev, ...response.items]);
+            setNextPageToken(response.nextPageToken || null);
+            setIsLoadingMore(false);
+        } catch (error) {
+            console.error("Background fetch failed", error);
+            setIsLoadingMore(false);
+            lastFetchedToken.current = null;
         }
     };
 
-        useEffect(() => {
-        fetchRecipes();
-    }, []);
+    const checkAndLoadMore = (newIndex: number) => {
+        const thresholdIndex = Math.floor(recipes.length * 0.7);
+        if (newIndex === thresholdIndex && nextPageToken && !isLoadingMore) {
+            loadMoreRecipes();
+        }
+    };
 
-  
     const handleSwipeLeft = () => {
-        if (currentIndex < recipes.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-        }
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+        checkAndLoadMore(nextIndex);
     };
 
-    const handleSwipeRight = async () => {
-        const currentRecipe = recipes[currentIndex];
-        if (currentIndex < recipes.length - 1) {
-            setCurrentIndex(prev => prev + 1);
-        }
+    const handleSwipeRight = () => {
+        const nextIndex = currentIndex + 1;
+        setCurrentIndex(nextIndex);
+        checkAndLoadMore(nextIndex);
     };
 
-    const handleRecipeClick = (recipe: Recipe) => {
-        window.open(recipe.url, '_blank');
+    const handleRestart = () => {
+        setCurrentIndex(0);
+        lastFetchedToken.current = null;
     };
 
     if (isLoading) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-bg-secondary">
-        <div className="text-center">
-          <div className="text-4xl mb-4 animate-bounce">🍳</div>
-          <p className="text-gray-600">Finding delicious recipes...</p>
-        </div>
-      </div>
-    );
-  }
-
-  if (error) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-bg-secondary">
-        <div className="text-center p-6">
-          <div className="text-6xl mb-4">😞</div>
-          <p className="text-danger mb-4 font-semibold">{error}</p>
-          <button 
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-hover"
-          >
-            Back to Kitchen
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  if (recipes.length === 0) {
-    return (
-      <div className="h-screen flex items-center justify-center bg-bg-secondary">
-        <div className="text-center p-6">
-          <div className="text-6xl mb-4">🤷</div>
-          <p className="text-xl font-semibold mb-2">No recipes found</p>
-          <p className="text-gray-500 mb-4">Try different ingredients or filters</p>
-          <button 
-            onClick={() => navigate('/')}
-            className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-hover"
-          >
-            Back to Kitchen
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="min-h-screen flex flex-col bg-bg-secondary">
-      {/* Header */}
-      <div className="p-4 bg-white border-b border-gray-200 sticky top-0 z-10">
-        <div className="flex items-center justify-between mb-2">
-          <button 
-            onClick={() => navigate('/')}
-            className="text-primary font-semibold"
-          >
-            ← Back
-          </button>
-          
-          {/* View Toggle */}
-          <div className="flex gap-2">
-            <button
-              onClick={() => setViewMode('swipe')}
-              className={`px-3 py-1 rounded-lg text-sm font-semibold ${
-                viewMode === 'swipe'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Swipe
-            </button>
-            <button
-              onClick={() => setViewMode('grid')}
-              className={`px-3 py-1 rounded-lg text-sm font-semibold ${
-                viewMode === 'grid'
-                  ? 'bg-primary text-white'
-                  : 'bg-gray-200 text-gray-700'
-              }`}
-            >
-              Grid
-            </button>
-          </div>
-        </div>
-        
-        <p className="text-sm text-gray-500">
-          Using: {ingredients.map(i => i.name).join(', ')}
-        </p>
-        
-        {viewMode === 'swipe' && (
-          <p className="text-xs text-gray-400 mt-1">
-            Recipe {currentIndex + 1} of {recipes.length}
-            {nextPageToken && ' (more available)'}
-          </p>
-        )}
-      </div>
-
-      {/* Content */}
-      {viewMode === 'swipe' ? (
-        <>
-          {/* Swipe View */}
-          <div className="flex-1 flex items-center justify-center p-4">
-            <RecipeCard 
-              recipe={recipes[currentIndex]}
-              onSwipeLeft={handleSwipeLeft}
-              onSwipeRight={handleSwipeRight}
-            />
-          </div>
-
-          {/* Loading more indicator */}
-          {isLoadingMore && (
-            <div className="text-center pb-2">
-              <p className="text-sm text-gray-500">Loading more recipes...</p>
+        return (
+            <div className="h-screen flex items-center justify-center bg-bg-secondary">
+                <div className="text-center animate-pulse">
+                    <i className="fa-solid fa-utensils text-5xl mb-4 text-primary"></i>
+                    <p className="text-gray-500 font-medium">Finding delicious recipes...</p>
+                </div>
             </div>
-          )}
+        );
+    }
 
-          {/* Swipe Buttons */}
-          <div className="p-4 flex gap-4 justify-center">
-            <button
-              onClick={handleSwipeLeft}
-              className="w-16 h-16 bg-danger text-white rounded-full text-2xl font-bold shadow-lg hover:bg-[#D06A4F] active:scale-95 transition-transform"
-            >
-              ✕
-            </button>
-            <button
-              onClick={handleSwipeRight}
-              className="w-16 h-16 bg-primary text-white rounded-full text-2xl font-bold shadow-lg hover:bg-primary-hover active:scale-95 transition-transform"
-            >
-              ♥
-            </button>
-          </div>
-        </>
-      ) : (
-        <>
-          {/* Grid View */}
-          <div className="flex-1 overflow-y-auto pb-4">
-            <RecipeList 
-              recipes={recipes}
-              onRecipeClick={handleRecipeClick}
-            />
-            
-            {/* Load More Button */}
-            {nextPageToken && (
-              <div className="flex justify-center p-4">
-                <button
-                  onClick={loadMoreRecipes}
-                  disabled={isLoadingMore}
-                  className="px-6 py-3 bg-primary text-white rounded-lg font-semibold hover:bg-primary-hover disabled:opacity-50 disabled:cursor-not-allowed"
+    if (error) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-bg-secondary p-6">
+                <div className="text-center bg-white p-8 rounded-3xl shadow-xl border border-gray-100 max-w-sm w-full">
+                    <i className="fa-solid fa-face-frown text-5xl mb-4 text-danger"></i>
+                    <p className="text-danger mb-6 font-semibold">{error}</p>
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                    >
+                        Back to Kitchen
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (currentIndex >= recipes.length) {
+        return (
+            <div className="min-h-screen flex flex-col bg-bg-secondary">
+                <div className="p-4 bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-100">
+                    <button 
+                        onClick={() => navigate('/')}
+                        className="text-primary font-bold flex items-center gap-2"
+                    >
+                        <i className="fa-solid fa-arrow-left"></i>
+                        Back to Kitchen
+                    </button>
+                </div>
+
+                <div className="flex-1 flex items-center justify-center p-6">
+                    <div className="bg-white rounded-3xl shadow-xl border border-gray-100 p-8 w-full max-w-sm text-center">
+                        <i className="fa-solid fa-champagne-glasses text-6xl mb-4 text-primary"></i>
+                        <h2 className="text-2xl font-bold text-gray-800 mb-2">That's all for now!</h2>
+                        <p className="text-gray-500 mb-8">
+                            We've gone through all the recipes matching your ingredients.
+                        </p>
+
+                        <div className="space-y-3">
+                            <button 
+                                onClick={handleRestart}
+                                className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                            >
+                                <i className="fa-solid fa-rotate-right"></i>
+                                Start Over
+                            </button>
+
+                            <button 
+                                onClick={() => navigate('/')}
+                                className="w-full py-3 bg-white border-2 border-primary text-primary rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                            >
+                                <i className="fa-solid fa-house"></i>
+                                Go to Kitchen
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen flex flex-col bg-bg-secondary">
+            {/* MOBILE HEADER */}
+            <div className="md:hidden p-4 flex items-center justify-between sticky top-0 z-10">
+                <button 
+                    onClick={() => navigate('/')}
+                    className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-primary transition-colors"
                 >
-                  {isLoadingMore ? 'Loading...' : 'Load More Recipes'}
+                    <i className="fa-solid fa-xmark text-xl"></i>
                 </button>
-              </div>
-            )}
-          </div>
-        </>
-      )}
-    </div>
-  );
+                
+                <div className="px-4 py-2 bg-white/90 backdrop-blur rounded-full shadow-sm border border-gray-100 max-w-[60%]">
+                    <p className="text-xs text-gray-500 font-medium truncate text-center">
+                        {ingredients.map(i => i.name).join(', ')}
+                    </p>
+                </div>
+
+                <div className="w-10" />
+            </div>
+
+            {/* DESKTOP HEADER */}
+            <div className="hidden md:flex items-center justify-between px-8 py-6 bg-white border-b border-gray-200">
+                {/* Left: Back Arrow */}
+                <button 
+                    onClick={() => navigate('/')}
+                    className="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all"
+                >
+                    <i className="fa-solid fa-arrow-left text-xl"></i>
+                    <span>Back</span>
+                </button>
+
+                {/* Center: Ingredients List */}
+                <div className="flex-1 flex justify-center px-8">
+                    <div className="bg-linear-to-r from-primary/10 via-safe/10 to-primary/10 px-8 py-3 rounded-full border-2 border-primary/20 shadow-sm max-w-3xl">
+                        <p className="text-sm font-semibold text-gray-700 text-center flex items-center justify-center gap-2">
+                            <i className="fa-solid fa-bowl-food text-primary"></i>
+                            {ingredients.map(i => i.name).join(' • ')}
+                        </p>
+                    </div>
+                </div>
+
+                {/* Right: Spacer for balance */}
+                <div className="w-24"></div>
+            </div>
+
+            {/* CARD AREA */}
+            <div className="flex-1 flex flex-col items-center justify-center p-4 md:p-8">
+                <RecipeCard 
+                    recipe={recipes[currentIndex]}
+                    onSwipeLeft={handleSwipeLeft}
+                    onSwipeRight={handleSwipeRight}
+                />
+            </div>
+
+            {/* ACTION BUTTONS */}
+            <div className="pb-8 pt-2 flex items-center justify-center gap-6">
+                <button
+                    onClick={handleSwipeLeft}
+                    className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-white border-2 text-danger rounded-full text-3xl md:text-4xl shadow-lg hover:bg-danger/10 hover:scale-105 active:scale-95 transition-all"
+                    aria-label="Skip"
+                >
+                    <i className="fa-solid fa-xmark"></i>
+                </button>
+                
+                <button
+                    onClick={handleSwipeRight}
+                    className="w-16 h-16 md:w-20 md:h-20 flex items-center justify-center bg-white text-primary rounded-full text-3xl md:text-4xl border-2 shadow-xl shadow-primary/30 hover:bg-primary/10 hover:scale-105 active:scale-95 transition-all"
+                    aria-label="Save"
+                >
+                    <i className="fa-solid fa-heart"></i>
+                </button>
+            </div>
+        </div>
+    );
 }

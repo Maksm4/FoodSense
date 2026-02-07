@@ -30,3 +30,6 @@ spec:
 
         - name: ReverseProxy__Clusters__InventoryAPICluster__Destinations__InventoryAPIDestination__Address
           value: "http://inventory-svc:80"
+
+        - name: ReverseProxy__Clusters__RecipesAPICluster__Destinations__RecipesAPIDestination__Address
+          value: "http://recipe-svc:80"

@@ -1,6 +1,6 @@
 namespace Recipe.API.Config;
 
-public class EdamamSettings
+public class Edamam
 {
     public const string SectionName = "Edamam";
     public string AppId { get; set; } = string.Empty;

@@ -11,7 +11,7 @@
     "Clusters": {
       "RecipesAPICluster": {
         "Destinations": {
-          "RecipesAPIDestionation": { "Address": "K8S_OVERRIDES" }
+          "RecipesAPIDestination": { "Address": "K8S_OVERRIDES" }
         }
       }
     }

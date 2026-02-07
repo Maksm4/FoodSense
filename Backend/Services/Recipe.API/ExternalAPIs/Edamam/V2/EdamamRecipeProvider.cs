@@ -9,10 +9,10 @@ using Recipe.API.Models;
 
 namespace Recipe.API.ExternalAPIs.Edamam.V2;
 
-public class EdamamRecipeProvider(HttpClient httpClient, IOptions<EdamamSettings> settings, 
+public class EdamamRecipeProvider(HttpClient httpClient, IOptions<Config.Edamam> settings, 
     IMapper mapper) : IRecipeProvider
 {
-    private readonly EdamamSettings _settings = settings.Value;
+    private readonly Config.Edamam _settings = settings.Value;
 
     public async Task<RecipeSearchResult> SearchRecipes(RecipeRequestDto request)
     {
@@ -39,7 +39,7 @@ public class EdamamRecipeProvider(HttpClient httpClient, IOptions<EdamamSettings
             throw new HttpRequestException(
                 $"Edamam API Error: {response.StatusCode}. Details: {errorContent}");
         }
-        // Deserialize Response
+
         var jsonOptions = new JsonSerializerOptions 
         { 
             PropertyNameCaseInsensitive = true 

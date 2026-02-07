@@ -20,6 +20,7 @@ export interface ProductItemResponse {
     id: string;
     productName: string;
     productSize: number;
+    categories: string[];
     brand: string;
     quantity: number;
     unit: number;
@@ -28,6 +29,9 @@ export interface ProductItemResponse {
 
 function mapDtoToModel(dto: ProductItemResponse): Ingredient {
     const expiry = new Date(dto.expirationDate);
+    const lastCategory = dto.categories && dto.categories.length > 0 
+        ? dto.categories.at(-1) || "" 
+        : "";
     return {
         id: dto.id,
         name: dto.productName || "Unknown",
@@ -37,7 +41,8 @@ function mapDtoToModel(dto: ProductItemResponse): Ingredient {
         size: dto.productSize,
         unitLabel: getUnitLabel(dto.unit),
         expirationDate: expiry,
-        isExpired: expiry < new Date()
+        isExpired: expiry < new Date(),
+        mainCategory: lastCategory
     };
 }
 

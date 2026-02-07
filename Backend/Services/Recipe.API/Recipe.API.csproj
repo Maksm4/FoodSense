@@ -5,12 +5,15 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>e4f381ee-1bda-4dc0-953a-3f40518d9b84</UserSecretsId>
+    <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="AutoMapper" Version="16.0.0" />
     <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="9.0.11" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="9.0.9" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="9.0.12" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.12" />
   </ItemGroup>
   
   <ItemGroup>
@@ -19,16 +22,13 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="AutoMapper">
-      <HintPath>..\..\..\..\..\.nuget\packages\automapper\15.1.0\lib\net9.0\AutoMapper.dll</HintPath>
-    </Reference>
-    <Reference Include="Microsoft.EntityFrameworkCore">
-      <HintPath>..\..\..\..\..\.nuget\packages\microsoft.entityframeworkcore\9.0.10\lib\net8.0\Microsoft.EntityFrameworkCore.dll</HintPath>
-    </Reference>
+    <ProjectReference Include="..\..\Common\Common.csproj" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Common\Common.csproj" />
+    <Content Include="..\..\.dockerignore">
+      <Link>.dockerignore</Link>
+    </Content>
   </ItemGroup>
 
 </Project>
