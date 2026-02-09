@@ -13,25 +13,22 @@ export interface CreateProductItemRequest {
     purchaseDate: string;
     expirationDate: string;
     productSize: number;
-    unit: number;
+    unit: string;
 }
 
 export interface ProductItemResponse {
     id: string;
     productName: string;
     productSize: number;
-    categories: string[];
+    mainCategory: string;
     brand: string;
     quantity: number;
-    unit: number;
+    unit: string;
     expirationDate: string;
 }
 
 function mapDtoToModel(dto: ProductItemResponse): Ingredient {
     const expiry = new Date(dto.expirationDate);
-    const lastCategory = dto.categories && dto.categories.length > 0 
-        ? dto.categories.at(-1) || "" 
-        : "";
     return {
         id: dto.id,
         name: dto.productName || "Unknown",
@@ -42,7 +39,7 @@ function mapDtoToModel(dto: ProductItemResponse): Ingredient {
         unitLabel: getUnitLabel(dto.unit),
         expirationDate: expiry,
         isExpired: expiry < new Date(),
-        mainCategory: lastCategory
+        mainCategory: dto.mainCategory
     };
 }
 

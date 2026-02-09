@@ -1,4 +1,4 @@
-export type BadgeColor = 'safe' | 'medium' | 'danger' | 'gray';
+export type BadgeColor = 'safe' | 'medium' | 'danger' | 'expired' | 'gray';
 
 export const Badge = ({ color = 'gray', text }: { color?: BadgeColor, text: string }) => {
   const colors = {
@@ -6,6 +6,7 @@ export const Badge = ({ color = 'gray', text }: { color?: BadgeColor, text: stri
     medium: "bg-medium text-white",   
     danger: "bg-danger text-white",   
     gray:   "bg-gray-200 text-gray-800",
+    expired: "bg-black text-white"
   };
 
   return (

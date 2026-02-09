@@ -1,11 +1,11 @@
-import type { CuisineType, MealType, Recipe, RecipeIngredient, RecipeSearchResult } from "../Data/Recipe";
+import { CuisineType, MealType, type Recipe, type RecipeIngredient, type RecipeSearchResult } from "../Data/Recipe";
 import apiClient from "./apiClient";
 
 interface RecipeIngredientDto {
   name: string;
   quantity?: number;
   measure?: string;
-  weight: string; // API sends string, but we want number in UI
+  weight: string;
 }
 
 interface RecipeDto {
@@ -13,6 +13,8 @@ interface RecipeDto {
   author: string;
   imageUrl: string;
   sourceUrl: string;
+  mealType: string;
+  cuisineType: string;
   preparationTime?: number;
   ingredients: RecipeIngredientDto[];
   calories?: number;
@@ -46,6 +48,8 @@ const mapRecipe = (dto: RecipeDto): Recipe => ({
     author: dto.author,
     image: dto.imageUrl,
     url: dto.sourceUrl,
+    mealType: dto.mealType as MealType,
+    cuisineType: dto.cuisineType as CuisineType,
     time: dto.preparationTime || 0,
     calories: Math.round(dto.calories || 0),
     tags: dto.healthLabels || [],

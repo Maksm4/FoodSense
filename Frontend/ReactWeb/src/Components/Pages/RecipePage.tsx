@@ -9,15 +9,19 @@ export default function RecipePage() {
     const location = useLocation();
     const navigate = useNavigate();
     const ingredients = (location.state?.ingredients as Ingredient[]) || [];
+    const kitchenId = (location.state?.kitchenId as string) || [];
+    const filters = location.state?.filters || {};
 
     const [recipes, setRecipes] = useState<Recipe[]>([]);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [nextPageToken, setNextPageToken] = useState<string | null>(null);
-    const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-    const lastFetchedToken = useRef<string | null>(null);
+    const shownRecipeUrls = useRef<Set<string>>(new Set());
+    const isFetchingRef = useRef(false);
+
+    const preloadedImages = useRef<Set<string>>(new Set());
+    const preloadBatchSize = 10;
 
     const getSearchTerms = () => {
         const categories = ingredients
@@ -28,8 +32,25 @@ export default function RecipePage() {
         return [...new Set(categories)];
     };
 
-    useEffect(() => {
-        async function fetchData() {
+    // Preload images func
+    const preloadImages = (startIndex: number, count: number) => {
+        const endIndex = Math.min(startIndex + count, recipes.length);
+        
+        for (let i = startIndex; i < endIndex; i++) {
+            const recipe = recipes[i];
+            if (recipe?.image && !preloadedImages.current.has(recipe.image)) {
+                const img = new Image();
+                img.src = recipe.image;
+                preloadedImages.current.add(recipe.image);
+            }
+        }
+    };
+
+    const fetchRandomRecipes = async () => {
+        if (isFetchingRef.current) return;
+        
+        try {
+            isFetchingRef.current = true;
             const searchTerms = getSearchTerms();
 
             if (searchTerms.length === 0) {
@@ -37,15 +58,37 @@ export default function RecipePage() {
                 return;
             }
 
+            const response = await recipeService.searchRecipes({
+                ingredients: searchTerms,
+                mealType: filters.mealType,
+                cuisineType: filters.cuisineType,
+            });
+
+            // Filter out recipes already shown
+            const newRecipes = (response.items || []).filter(
+                recipe => !shownRecipeUrls.current.has(recipe.url)
+            );
+
+            newRecipes.forEach(recipe => {
+                shownRecipeUrls.current.add(recipe.url);
+            });
+
+            return newRecipes;
+        } finally {
+            isFetchingRef.current = false;
+        }
+    };
+
+    // Initial load
+    useEffect(() => {
+        async function fetchData() {
             try {
                 setIsLoading(true);
-                const response = await recipeService.searchRecipes({
-                    ingredients: searchTerms
-                });
-
-                setRecipes(response.items || []);
-                setNextPageToken(response.nextPageToken || null);
-                setIsLoading(false);
+                const newRecipes = await fetchRandomRecipes();
+                if (newRecipes) {
+                    setRecipes(newRecipes);
+                    setIsLoading(false);
+                }
             } catch (err) {
                 setError(err instanceof Error ? err.message : 'Failed to fetch recipes');
                 setIsLoading(false);
@@ -54,35 +97,51 @@ export default function RecipePage() {
         fetchData();
     }, []); 
 
+    // Preload first batch of images when recipes are loaded
+    useEffect(() => {
+        if (recipes.length > 0 && preloadedImages.current.size === 0) {
+            preloadImages(0, preloadBatchSize);
+        }
+    }, [recipes]);
+
+    useEffect(() => {
+        // When user reaches index that's 5 away from last preloaded batch
+        const nextPreloadIndex = Math.floor(currentIndex / preloadBatchSize) * preloadBatchSize + preloadBatchSize;
+        
+        if (currentIndex >= nextPreloadIndex - 5 && nextPreloadIndex < recipes.length) {
+            preloadImages(nextPreloadIndex, preloadBatchSize);
+        }
+    }, [currentIndex, recipes]);
+
     const loadMoreRecipes = async () => {
-        if (!nextPageToken || isLoadingMore) return;
-        if (lastFetchedToken.current === nextPageToken) return;
+        if (isLoading) return;
 
         try {
-            console.log("Fetching more recipes...");
-            setIsLoadingMore(true);
-            lastFetchedToken.current = nextPageToken;
+            setIsLoading(true);
+            const newRecipes = await fetchRandomRecipes();
 
-            const searchTerms = getSearchTerms();
-
-            const response = await recipeService.searchRecipes({
-                ingredients: searchTerms,
-                nextPageToken: nextPageToken
-            });
-
-            setRecipes(prev => [...prev, ...response.items]);
-            setNextPageToken(response.nextPageToken || null);
-            setIsLoadingMore(false);
+            if (newRecipes && newRecipes.length > 0) {
+                setRecipes(prev => {
+                    const updated = [...prev, ...newRecipes];
+                    
+                    const startPreloadIndex = prev.length;
+                    setTimeout(() => {
+                        preloadImages(startPreloadIndex, preloadBatchSize);
+                    }, 100);
+                    
+                    return updated;
+                });
+            }
+            
+            setIsLoading(false);
         } catch (error) {
-            console.error("Background fetch failed", error);
-            setIsLoadingMore(false);
-            lastFetchedToken.current = null;
+            console.error("Failed to load more recipes", error);
+            setIsLoading(false);
         }
     };
 
     const checkAndLoadMore = (newIndex: number) => {
-        const thresholdIndex = Math.floor(recipes.length * 0.7);
-        if (newIndex === thresholdIndex && nextPageToken && !isLoadingMore) {
+        if (newIndex >= recipes.length - 5) {
             loadMoreRecipes();
         }
     };
@@ -101,7 +160,13 @@ export default function RecipePage() {
 
     const handleRestart = () => {
         setCurrentIndex(0);
-        lastFetchedToken.current = null;
+        shownRecipeUrls.current.clear();
+        preloadedImages.current.clear();
+        
+        // Preload first batch again
+        setTimeout(() => {
+            preloadImages(0, preloadBatchSize);
+        }, 100);
     };
 
     if (isLoading) {
@@ -122,7 +187,27 @@ export default function RecipePage() {
                     <i className="fa-solid fa-face-frown text-5xl mb-4 text-danger"></i>
                     <p className="text-danger mb-6 font-semibold">{error}</p>
                     <button 
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate(`/kitchens/${kitchenId}`)}
+                        className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
+                    >
+                        Back to Kitchen
+                    </button>
+                </div>
+            </div>
+        );
+    }
+
+    if (recipes.length === 0) {
+        return (
+            <div className="h-screen flex items-center justify-center bg-bg-secondary p-6">
+                <div className="text-center bg-white p-8 rounded-3xl shadow-xl border border-gray-100 max-w-sm w-full">
+                    <i className="fa-solid fa-bowl-food text-5xl mb-4 text-gray-400"></i>
+                    <h2 className="text-xl font-bold text-gray-800 mb-2">No Recipes Found</h2>
+                    <p className="text-gray-500 mb-6">
+                        We couldn't find any recipes matching your ingredients.
+                    </p>
+                    <button 
+                        onClick={() => navigate(`/kitchens/${kitchenId}`)}
                         className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-colors shadow-lg shadow-primary/20"
                     >
                         Back to Kitchen
@@ -137,7 +222,7 @@ export default function RecipePage() {
             <div className="min-h-screen flex flex-col bg-bg-secondary">
                 <div className="p-4 bg-white/80 backdrop-blur-md sticky top-0 z-10 border-b border-gray-100">
                     <button 
-                        onClick={() => navigate('/')}
+                        onClick={() => navigate(`/kitchens/${kitchenId}`)}
                         className="text-primary font-bold flex items-center gap-2"
                     >
                         <i className="fa-solid fa-arrow-left"></i>
@@ -163,7 +248,7 @@ export default function RecipePage() {
                             </button>
 
                             <button 
-                                onClick={() => navigate('/')}
+                                onClick={() => navigate(`/kitchens/${kitchenId}`)}
                                 className="w-full py-3 bg-white border-2 border-primary text-primary rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
                             >
                                 <i className="fa-solid fa-house"></i>
@@ -181,7 +266,7 @@ export default function RecipePage() {
             {/* MOBILE HEADER */}
             <div className="md:hidden p-4 flex items-center justify-between sticky top-0 z-10">
                 <button 
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate(`/kitchens/${kitchenId}`)}
                     className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-primary transition-colors"
                 >
                     <i className="fa-solid fa-xmark text-xl"></i>
@@ -198,16 +283,14 @@ export default function RecipePage() {
 
             {/* DESKTOP HEADER */}
             <div className="hidden md:flex items-center justify-between px-8 py-6 bg-white border-b border-gray-200">
-                {/* Left: Back Arrow */}
                 <button 
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate(`/kitchens/${kitchenId}`)}
                     className="flex items-center gap-2 text-primary font-bold hover:gap-3 transition-all"
                 >
                     <i className="fa-solid fa-arrow-left text-xl"></i>
                     <span>Back</span>
                 </button>
 
-                {/* Center: Ingredients List */}
                 <div className="flex-1 flex justify-center px-8">
                     <div className="bg-linear-to-r from-primary/10 via-safe/10 to-primary/10 px-8 py-3 rounded-full border-2 border-primary/20 shadow-sm max-w-3xl">
                         <p className="text-sm font-semibold text-gray-700 text-center flex items-center justify-center gap-2">
@@ -217,7 +300,6 @@ export default function RecipePage() {
                     </div>
                 </div>
 
-                {/* Right: Spacer for balance */}
                 <div className="w-24"></div>
             </div>
 

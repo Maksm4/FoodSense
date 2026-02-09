@@ -3,7 +3,7 @@ import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
 import { productService, type ProductResponse } from "../../api/productService";
 import { ingredientsService, type CreateProductItemRequest } from "../../api/ingredientsService";
-import { UNITS } from "./enums";
+import { Unit } from "./enums";
 
 interface AddItemPopupProps {
     isOpen: boolean;
@@ -13,15 +13,13 @@ interface AddItemPopupProps {
 }
 
 export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: AddItemPopupProps) {
-    // Search
     const [searchQuery, setSearchQuery] = useState("");
     const [searchResults, setSearchResults] = useState<ProductResponse[]>([]);
     const [selectedProduct, setSelectedProduct] = useState<ProductResponse | null>(null);
 
-    // Form
     const [quantity, setQuantity] = useState(1);
     const [productSize, setProductSize] = useState(0);
-    const [unit, setUnit] = useState(0);
+    const [unit, setUnit] = useState("");
 
     const [price, setPrice] = useState(0);
     const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);
@@ -55,7 +53,7 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
                 purchaseDate: purchaseDate,
                 expirationDate: expirationDate,
                 productSize: Number(productSize),
-                unit: Number(unit) 
+                unit: unit 
             };
 
             await ingredientsService.add(kitchenId, payload);
@@ -96,7 +94,6 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
                             />
                         </div>
 
-                        {/* Search Results List */}
                         {searchResults.length > 0 && (
                             <ul className="border rounded-md divide-y max-h-60 overflow-y-auto">
                                 {searchResults.map(p => (
@@ -170,10 +167,10 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
                                     <select 
                                         className="w-full h-42px px-3 border border-gray-300 rounded-lg bg-white focus:ring-2 focus:ring-blue-500 outline-none text-sm"
                                         value={unit}
-                                        onChange={(e) => setUnit(Number(e.target.value))}
+                                        onChange={(e) => setUnit(e.target.value)}
                                     >
-                                        {UNITS.map(u => (
-                                            <option key={u.id} value={u.id}>{u.label}</option>
+                                        {Object.values(Unit).map(u => (
+                                            <option key={u} value={u}>{u}</option>
                                         ))}
                                     </select>
                                     <span className="text-[10px] text-gray-400 pl-1">Unit</span>
@@ -181,7 +178,7 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
                             </div>
                             
                             <div className="text-xs text-gray-500 mt-1 text-right">
-                                Total Inventory: <strong>{quantity * productSize} {UNITS.find(u => u.id === unit)?.label}</strong>
+                                Total Inventory: <strong>{quantity * productSize} {unit}</strong>
                             </div>
                         </div>
 

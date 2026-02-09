@@ -37,7 +37,6 @@ namespace Inventory.API.Services
             
             Product? product =  await productRepository.GetById(productId.Value);
             
-            // Ensure the product is either global or created by the current user
             if (product is { Scope: ProductScope.Private } && product.CreatedBy != userId)
             {
                 return null;

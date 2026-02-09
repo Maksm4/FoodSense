@@ -1,4 +1,6 @@
-namespace Recipe.API.DTOs;
+using Recipe.API.Models.Enums;
+
+namespace Recipe.API.DTOs.Response;
 
 public class RecipeResponseDto
 {
@@ -9,5 +11,7 @@ public class RecipeResponseDto
     public int PreparationTime { get; set; } // in minutes
     public ICollection<IngredientResponseDto> Ingredients { get; init; } = [];
     public float? Calories { get; set; }
+    public MealType MealType { get; set; }
+    public CuisineType CuisineType { get; set; } 
     public ICollection<string> HealthLabels { get; init; } = [];
 }

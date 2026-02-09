@@ -2,7 +2,7 @@ import { useRef } from "react";
 import type { Ingredient } from "../../Data/Ingredient";
 import { Badge, type BadgeColor } from "../UI/Badge";
 import { Card } from "../UI/Card";
-import { getUnitLabel } from "./enums";
+import { Unit } from "./enums";
 
 interface IngredientItemProps {
     ingredient: Ingredient;
@@ -35,6 +35,7 @@ export default function IngredientItem({
     const days = getDaysUntilExpiry();
 
     const getBadgeColor = (d: number): BadgeColor => {
+        if (d < 0) return "expired";
         if (d < 3) return "danger";
         if (d <= 7) return "medium";
         return "safe";
@@ -83,7 +84,7 @@ export default function IngredientItem({
 
     const getSubtitle = () => {
         const label = ingredient.unitLabel;
-        if (ingredient.unit === 0) {
+        if (ingredient.unit === Unit.Pcs) {
             return `${ingredient.quantity} ${label}`;
         }
         return `${ingredient.quantity} • ${ingredient.size} ${label}`;
@@ -94,7 +95,7 @@ export default function IngredientItem({
             title={ingredient.name}
             subtitle={getSubtitle()}
             isSelected={isSelected} 
-            className="select-none relative"
+            className={`select-none relative ${days < 0 ? 'bg-cancel-danger-hover animate-pulse' : ''}`}
             
             action={
                 <div className="flex flex-col items-end justify-between h-full min-h-50px gap-2">

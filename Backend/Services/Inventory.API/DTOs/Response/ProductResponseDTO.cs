@@ -9,8 +9,6 @@ namespace Inventory.API.DTOs.Response
         public string Brand { get; set; } = string.Empty;
         public string BarCode { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public Guid CategoryId { get; set; }
-        public string CategoryName { get; set; } = string.Empty;
         public Unit DefaultUnit { get; set; }
     }
 }

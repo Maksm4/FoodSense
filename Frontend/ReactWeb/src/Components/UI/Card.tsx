@@ -9,7 +9,7 @@ export const Card = ({ title, subtitle, action, isSelected, className, ...props 
   return (
     <div 
       className={`
-        bg-white border rounded-xl p-4 shadow-sm 
+        border rounded-xl p-4 shadow-sm 
         flex justify-between items-center transition-all duration-200
         ${props.onClick ? 'cursor-pointer' : ''}
         

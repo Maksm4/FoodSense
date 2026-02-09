@@ -17,7 +17,7 @@ namespace Inventory.API.Data.Context.Configuration
             builder.Property(p => p.BarCode).HasMaxLength(50);
 
             builder.Property(p => p.Id).ValueGeneratedOnAdd();
-
+            
             builder.HasMany(p => p.ProductItems)
                 .WithOne(pi => pi.Product)
                 .HasForeignKey(pi => pi.ProductId)

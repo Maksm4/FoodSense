@@ -16,18 +16,7 @@ public class EdamamRecipeProvider(HttpClient httpClient, IOptions<Config.Edamam>
 
     public async Task<RecipeSearchResult> SearchRecipes(RecipeRequestDto request)
     {
-        string requestUrl;
-        
-        if (!string.IsNullOrEmpty(request.NextPageToken))
-        {
-            //nextpage token
-            requestUrl = request.NextPageToken;
-        }
-        else
-        {
-            //fresh search
-            requestUrl = BuildRequestUrl(request);
-        }
+        string requestUrl = BuildRequestUrl(request);
 
         var httpRequest = new HttpRequestMessage(HttpMethod.Get, requestUrl);
         
@@ -110,7 +99,7 @@ public class EdamamRecipeProvider(HttpClient httpClient, IOptions<Config.Edamam>
         string[] requiredFields =
         [
             "label", "image", "source", "url", "calories", 
-            "totalTime", "healthLabels", "ingredients"
+            "totalTime", "healthLabels", "ingredients", "mealType", "cuisineType"
         ];
         
         foreach (var field in requiredFields)
@@ -124,7 +113,7 @@ public class EdamamRecipeProvider(HttpClient httpClient, IOptions<Config.Edamam>
         
         var maxIngr = inputCount + 8; //  for some add on ingredients like salt, oil, etc.
         builder.Append($"&ingr=1-{maxIngr}");
-
+        builder.Append($"&random=true"); // to get more variety in results
         return builder.ToString();
     }
 }

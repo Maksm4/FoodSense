@@ -16,4 +16,6 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
         var recipes = await recipeService.GetRecipes(request);
         return Ok(recipes);
     }
+    
+    //save favourite recipe 
 }

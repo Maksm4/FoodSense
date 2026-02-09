@@ -39,8 +39,20 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
         }
     };
 
+    const formatMeasure = (measure: string, quantity: number) => {
+        if (!measure || measure === "<unit>") {
+            return '';
+        }
+        if (quantity > 0) {
+            return `${quantity} ${measure}`;
+        }
+
+        return measure;
+    };
+
     return (
         <>
+            {/* Mobile */}
             <div 
                 className={`
                     md:hidden
@@ -54,7 +66,7 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                 onTouchMove={onTouchMove}
                 onTouchEnd={onTouchEnd}
             >
-                {/* Photo with Calories Badge */}
+                {/* Photo */}
                 <div className="relative h-80 bg-gray-100">
                     <img 
                         src={recipe.image} 
@@ -62,7 +74,7 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                         className="w-full h-full object-cover"
                         loading="lazy"
                     />
-                    {/* Calories Badge - Top Right */}
+                    {/* Calories Badge */}
                     <div className="absolute top-4 right-4 bg-white/95 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg border border-gray-100 flex items-center gap-2">
                         <i className="fa-solid fa-fire text-danger text-sm"></i>
                         <span className="text-sm font-bold text-gray-800">
@@ -73,8 +85,7 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
 
                 {/* Content */}
                 <div className="p-6">
-                    {/* Title */}
-                    <h3 className="text-2xl font-bold text-gray-800 leading-tight mb-6">
+                    <h3 className="text-2xl font-bold text-gray-800 leading-tight mb-6 line-clamp-2">
                         {recipe.title}
                     </h3>
 
@@ -104,22 +115,27 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                                     Ingredients
                                 </p>
                                 <ul className="space-y-2">
-                                    {recipe.ingredients?.map((ing, idx) => (
-                                        <li key={idx} className="text-sm text-gray-700 pb-2 border-b border-gray-100 last:border-0">
-                                            <span className="font-bold text-primary">
-                                                {ing.quantity > 0 ? `${ing.quantity} ${ing.measure}` : ing.measure}
-                                            </span>{' '}
-                                            <span>{ing.text}</span>
-                                        </li>
-                                    ))}
+                                    {recipe.ingredients?.map((ing, idx) => {
+                                        const measure = formatMeasure(ing.measure, ing.quantity);
+                                        return (
+                                            <li key={idx} className="text-sm text-gray-700 pb-2 border-b border-gray-100 last:border-0">
+                                                {measure && (
+                                                    <span className="font-bold text-primary">
+                                                        {measure}
+                                                    </span>
+                                                )}
+                                                {measure && ' '}
+                                                <span>{ing.text}</span>
+                                            </li>
+                                        );
+                                    })}
                                 </ul>
-                                {/* Arrow */}
                                 <div className="absolute top-full left-6 -mt-2 w-0 h-0 border-l-8 border-r-8 border-t-8 border-transparent border-t-white"></div>
                             </div>
                         </div>
                     </div>
 
-                    {/* Tags (3 tags) */}
+                    {/* Tags only 3*/}
                     <div className="flex flex-wrap gap-2 mb-6">
                         {recipe.tags.slice(0, 3).map((tag) => (
                             <span 
@@ -146,8 +162,9 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                 </div>
             </div>
 
+            {/* desktop */}
             <div className="hidden md:flex bg-white rounded-3xl shadow-2xl overflow-hidden border border-gray-200 w-full max-w-6xl h-150">
-                {/* LEFT: Ingredients List - 2 parts */}
+                {/* LEFT: Ingredients List*/}
                 <div className="flex-2 bg-linear-to-b from-bg-secondary to-white p-6 overflow-y-auto border-r border-gray-200">
                     <div className="sticky top-0 bg-linear-to-b from-bg-secondary to-transparent pb-3 mb-4">
                         <h4 className="text-xl font-bold text-gray-800 flex items-center gap-2">
@@ -157,23 +174,29 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                     </div>
                     
                     <ul className="space-y-3">
-                        {recipe.ingredients?.map((ing, idx) => (
-                            <li key={idx} className="text-sm pb-3 border-b border-gray-200 last:border-0">
-                                <div className="flex items-start gap-2">
-                                    <i className="fa-solid fa-circle-check text-primary text-xs mt-1 shrink-0"></i>
-                                    <div className="flex-1">
-                                        <span className="text-primary font-bold">
-                                            {ing.quantity > 0 ? `${ing.quantity} ${ing.measure}` : ing.measure || ''}
-                                        </span>{' '}
-                                        <span className="text-gray-700">{ing.text}</span>
+                        {recipe.ingredients?.map((ing, idx) => {
+                            const measure = formatMeasure(ing.measure, ing.quantity);
+                            return (
+                                <li key={idx} className="text-sm pb-3 border-b border-gray-200 last:border-0">
+                                    <div className="flex items-start gap-2">
+                                        <i className="fa-solid fa-circle-check text-primary text-xs mt-1 shrink-0"></i>
+                                        <div className="flex-1">
+                                            {measure && (
+                                                <span className="text-primary font-bold">
+                                                    {measure}
+                                                </span>
+                                            )}
+                                            {measure && ' '}
+                                            <span className="text-gray-700">{ing.text}</span>
+                                        </div>
                                     </div>
-                                </div>
-                            </li>
-                        ))}
+                                </li>
+                            );
+                        })}
                     </ul>
                 </div>
 
-                {/* MIDDLE: Photo - 3 parts (wider!) */}
+                {/* MIDDLE: Photo*/}
                 <div className="flex-3 relative bg-gray-100 shrink-0">
                     <img 
                         src={recipe.image} 
@@ -183,11 +206,11 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                     />
                 </div>
 
-                {/* RIGHT: Recipe Info - 2 parts */}
-                <div className="flex-2 p-8 flex flex-col bg-linear-to-b from-white to-bg-secondary">
-                    {/* Title & Author */}
-                    <div className="mb-6">
-                        <h3 className="text-3xl font-bold text-gray-800 leading-tight mb-2">
+                {/* RIGHT: Recipe Info*/}
+                <div className="flex-2 p-8 flex flex-col bg-linear-to-b from-white to-bg-secondary overflow-y-auto">
+                    {/* Title & Author*/}
+                    <div className="mb-6 shrink-0">
+                        <h3 className="text-2xl font-bold text-gray-800 leading-tight mb-2 line-clamp-3">
                             {recipe.title}
                         </h3>
                         <p className="text-sm text-gray-500 font-medium flex items-center gap-2">
@@ -197,7 +220,7 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                     </div>
 
                     {/* Stats Grid */}
-                    <div className="grid grid-cols-2 gap-3 mb-6">
+                    <div className="grid grid-cols-2 gap-3 mb-6 shrink-0">
                         {/* Time */}
                         <div className="bg-white p-4 rounded-xl border border-gray-200 shadow-sm">
                             <div className="text-xs text-gray-500 mb-1 font-semibold uppercase flex items-center gap-1">
@@ -241,8 +264,8 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                         </div>
                     </div>
 
-                    {/* Tags (5 tags) */}
-                    <div className="mb-6">
+                    {/* Tags only 5 */}
+                    <div className="mb-6 shrink-0">
                         <div className="text-xs text-gray-500 mb-3 font-semibold uppercase tracking-wide flex items-center gap-2">
                             <i className="fa-solid fa-tags"></i>
                             Tags
@@ -264,7 +287,7 @@ export default function RecipeCard({ recipe, onSwipeLeft, onSwipeRight }: Recipe
                         href={recipe.url} 
                         target="_blank" 
                         rel="noopener noreferrer"
-                        className="mt-auto w-full text-center py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                        className="mt-auto shrink-0 w-full text-center py-4 bg-primary text-white font-bold rounded-2xl hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
                         onClick={(e) => e.stopPropagation()}
                     >
                         View Full Recipe

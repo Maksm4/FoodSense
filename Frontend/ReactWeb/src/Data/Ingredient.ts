@@ -4,7 +4,7 @@ export interface Ingredient {
     brand: string;
     quantity: number;
     size: number;
-    unit: number,
+    unit: string,
     unitLabel: string;
     expirationDate: Date;
     isExpired: boolean;

@@ -1,17 +1,21 @@
-import { useNavigate } from "react-router-dom";
 import { authService } from "../../api/authService";
 
-export default function Logout() {
-    const navigate = useNavigate();
+interface LogoutProps {
+    className?: string;
+}
 
-    const handleClick = async () => {
+export default function Logout({ className }: LogoutProps) {
+    const handleLogout = () => {
         authService.logout();
-        navigate('/');
-    }
-    return (<div className=" ">
-        <button onClick={handleClick} className="border rounded-lg px-7 bg-cancel hover:bg-cancel-hover">
-            Logout
+    };
+
+    return (
+        <button
+            onClick={handleLogout}
+            className={className || "w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-danger/10 transition-colors text-gray-700 hover:text-danger"}
+        >
+            <i className="fa-solid fa-right-from-bracket text-danger"></i>
+            <span className="font-medium">Logout</span>
         </button>
-    </div>
-    )
+    );
 }

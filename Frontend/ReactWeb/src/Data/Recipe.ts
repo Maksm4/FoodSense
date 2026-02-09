@@ -33,7 +33,6 @@ export const CuisineType = {
   Greek: 'Greek'
 } as const;
 
-// This generates the type: "American" | "Asian" | "British" | ...
 export type CuisineType = typeof CuisineType[keyof typeof CuisineType];
 
 export interface RecipeIngredient {
@@ -51,6 +50,8 @@ export interface Recipe {
     url: string;
     time: number;
     calories: number;
+    mealType: MealType;
+    cuisineType: CuisineType;
     tags: string[];
     ingredients: RecipeIngredient[];
 }

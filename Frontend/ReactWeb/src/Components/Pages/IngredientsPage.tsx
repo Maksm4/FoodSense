@@ -4,14 +4,16 @@ import IngredientsList from "../Ingredients/IngredientsList";
 import SearchBar from "../Ingredients/SearchBar";
 import type { Ingredient } from "../../Data/Ingredient";
 import { useNavigate, useParams } from "react-router-dom";
-import Logout from "../Auth/Logout";
 import { PageContainer } from "../UI/PageContainer";
 import { ingredientsService } from "../../api/ingredientsService";
 import { Button } from "../UI/Button";
 import AddItemPopup from "../Ingredients/AddItemPopup";
+import ProfilePopup from "../Profile/ProfilePopup";
+import RecipeFilterPopup from "../Recipe/RecipesFilterPopup";
 
 export default function IngredientsPage() {
     const [ingredients, setIngredients] = useState<Ingredient[]>([]);
+    const [isFilterOpen, setIsFilterOpen] = useState(false);
 
     const [mode, setMode] = useState<string>("default"); // default/cooking
     const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -21,7 +23,7 @@ export default function IngredientsPage() {
 
     const [error, setError] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+    const [isAddItemOpen, setIsAddItemOpen] = useState(false);
 
     const { kitchenId } = useParams();
 
@@ -99,13 +101,23 @@ export default function IngredientsPage() {
     };
 
     const handleCook = () => {
-        //nav to recipes
-        const selectedIngredients = ingredients.
-            filter(ingredient => selectedItems.includes(ingredient.id))
+        setIsFilterOpen(true);
+    };
+
+    const handleCookWithFilters = (filters: { mealType?: string; cuisineType?: string }) => {
+        const selectedIngredients = ingredients.filter(ingredient => 
+            selectedItems.includes(ingredient.id)
+        );
 
         navigate('/recipes', {
-            state: { ingredients: selectedIngredients }
-        })
+            state: { 
+                ingredients: selectedIngredients, 
+                kitchenId: kitchenId,
+                filters: filters
+            }
+        });
+
+        setIsFilterOpen(false);
     };
 
     const filteredIngredients = ingredients.
@@ -119,20 +131,17 @@ export default function IngredientsPage() {
                     className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
                     onClick={() => navigate('/kitchens')}
                 >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                    </svg>
-                    Back
+                <i className="fa-solid fa-left-long"></i>
                 </Button>
-                <Logout />
+                <SearchBar
+                    onSearchChange={setSearchQuery}
+                    searchQuery={searchQuery}
+                    onClickCookMode={handleCookModeClick}
+                    onClickCancelCookMode={handleCancelCooking}
+                    mode={mode}
+                />
+                <ProfilePopup userName=""></ProfilePopup>
             </div>
-            <SearchBar 
-                onSearchChange={setSearchQuery}
-                searchQuery={searchQuery}
-                onClickCookMode={handleCookModeClick}
-                onClickCancelCookMode={handleCancelCooking}
-                mode={mode}
-            />
             <IngredientsList 
                 ingredients={filteredIngredients}
                 mode={mode}
@@ -146,13 +155,18 @@ export default function IngredientsPage() {
                 mode={mode}
                 onCook={handleCook}
                 onCancel={handleCancelCooking}
-                onAdd={() => setIsAddModalOpen(true)}
+                onAdd={() => setIsAddItemOpen(true)}
             />
             <AddItemPopup
-                isOpen={isAddModalOpen}
-                onClose={() => setIsAddModalOpen(false)}
+                isOpen={isAddItemOpen}
+                onClose={() => setIsAddItemOpen(false)}
                 onAdded={loadData}
                 kitchenId={kitchenId!} 
+            />
+            <RecipeFilterPopup
+                isOpen={isFilterOpen}
+                onClose={() => setIsFilterOpen(false)}
+                onCook={handleCookWithFilters}
             />
         </PageContainer>
     );

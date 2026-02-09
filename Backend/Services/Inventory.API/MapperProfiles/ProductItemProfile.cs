@@ -12,7 +12,7 @@ public class ProductItemProfile : Profile
         CreateMap<ProductItem, ProductItemResponseDTO>()
             .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
             .ForMember(dest => dest.Brand, opt => opt.MapFrom(src => src.Product.Brand))
-            .ForMember(dest => dest.Categories, opt => opt.MapFrom(src => src.Product.Categories.Select(cat => cat.Name)));
+            .ForMember(dest => dest.MainCategory, opt => opt.MapFrom(src => src.Product.Categories.LastOrDefault() != null ? src.Product.Categories.LastOrDefault()!.Name : string.Empty));
         
         CreateMap<UpdateProductItemDto, ProductItem>()
             .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));

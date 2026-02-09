@@ -30,6 +30,8 @@ public class EdamamRecipeDto
     public string Url { get; set; }
     public float TotalTime { get; set; }
     public float Calories { get; set; }
+    public ICollection<string> MealType { get; set; } = [];
+    public ICollection<string> CuisineType { get; set; } = [];
     public ICollection<string> HealthLabels { get; set; } = [];
     public ICollection<EdamamIngredientDto> Ingredients { get; set; } = [];
 }
