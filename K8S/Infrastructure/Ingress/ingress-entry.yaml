@@ -10,7 +10,6 @@ spec:
   - host: foodsense.local
     http:
       paths:
-      # ONLY routing API traffic to the cluster
       - path: /api/.*
         pathType: ImplementationSpecific
         backend:

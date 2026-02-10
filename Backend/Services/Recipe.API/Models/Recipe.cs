@@ -16,4 +16,5 @@ public class Recipe
     public MealType MealType { get; set; }
     public ICollection<string> HealthLabels { get; init; } = [];
     public string ExternalId { get; set; } = string.Empty;
+    public ICollection<UserRecipe> UserRecipes { get; init; } = new List<UserRecipe>();
 }

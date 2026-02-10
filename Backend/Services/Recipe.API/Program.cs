@@ -7,6 +7,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Recipe.API.Config;
 using Recipe.API.Data.Context;
+using Recipe.API.Data.Repository;
 using Recipe.API.ExternalAPIs;
 using Recipe.API.ExternalAPIs.Edamam.V2;
 using Recipe.API.Services;
@@ -14,9 +15,9 @@ using Recipe.API.Services;
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
-// builder.Services.AddDbContext<RecipeDbContext>(
-//         opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-//     );
+builder.Services.AddDbContext<RecipeDbContext>(
+        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    );
 
 //services
 builder.Services.AddScoped<IRecipeService, RecipeService>();
@@ -24,6 +25,7 @@ builder.Services.AddScoped<IRecipeService, RecipeService>();
 //Common
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<ICurrentUser, HeaderCurrentUser>();
+builder.Services.AddScoped<IRecipeRepository, RecipeRepository>();
 
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
@@ -61,6 +63,7 @@ builder.Services.AddHttpClient<IRecipeProvider, EdamamRecipeProvider>(client =>
 });
 
 builder.Services.AddAutoMapper(_ => { }, typeof(Program));
+
 var app = builder.Build();
 
 app.UseExceptionHandler(opt => { });
@@ -73,5 +76,24 @@ if (app.Environment.IsDevelopment())
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
+
+
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    try
+    {
+        var context = services.GetRequiredService<RecipeDbContext>(); 
+        if (context.Database.GetPendingMigrations().Any())
+        {
+            context.Database.Migrate();
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = services.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while migrating the database");
+    }
+}
 
 app.Run();

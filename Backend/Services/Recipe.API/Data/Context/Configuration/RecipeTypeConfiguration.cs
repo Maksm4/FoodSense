@@ -14,5 +14,18 @@ public class RecipeTypeConfiguration : IEntityTypeConfiguration<Models.Recipe>
         builder.Property(r => r.SourceUrl).IsRequired();
         builder.Property(r => r.Author).IsRequired();
         builder.Property(r => r.ExternalId).IsRequired();
+
+        builder.HasMany(r => r.UserRecipes)
+            .WithOne(u => u.Recipe)
+            .HasForeignKey(r => r.RecipeId)
+            .IsRequired()
+            .OnDelete(DeleteBehavior.Cascade);
+        
+        builder.Ignore(r => r.Ingredients); 
+        builder.Ignore(r => r.HealthLabels);
+        builder.Ignore(r => r.Calories);
+        builder.Ignore(r => r.PreparationTime);
+        builder.Ignore(r => r.CuisineType);
+        builder.Ignore(r => r.MealType);
     }
 }

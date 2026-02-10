@@ -12,6 +12,10 @@ spec:
       labels:
         app: recipe-api
     spec:
+      initContainers:
+        - name: wait-for-sql
+          image: busybox
+          command: ['sh', '-c', "until nc -z sql-server-svc 1433; do echo waiting for sql; sleep 2; done"]
       containers:
         - name: recipe-api
           image: maksm4/recipeapi:latest
@@ -19,6 +23,11 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: app-secrets
+                  key: recipe-conn
             - name: JwtSettings__SecretKey
               valueFrom:
                 secretKeyRef:

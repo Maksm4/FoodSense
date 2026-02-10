@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Recipe.API.DTOs;
+using Recipe.API.DTOs.Request;
 using Recipe.API.DTOs.Response;
 using Recipe.API.Services;
 
@@ -17,5 +18,18 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
         return Ok(recipes);
     }
     
-    //save favourite recipe 
+    [HttpGet]
+    [ProducesResponseType(typeof(IEnumerable<SavedRecipeResponseDto>), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    public async Task<IActionResult> GetSavedRecipes()
+    {
+        var recipes = await recipeService.GetSavedRecipes();
+        return Ok(recipes);
+    }
+    
+    public async Task<IActionResult> SaveRecipe([FromBody] SaveRecipeRequestDto request)
+    {
+        await recipeService.SaveRecipe(request);
+        return NoContent();
+    }
 }

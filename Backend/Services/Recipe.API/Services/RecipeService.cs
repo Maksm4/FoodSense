@@ -1,13 +1,17 @@
 using AutoMapper;
+using Common.Services;
+using Recipe.API.Data.Repository;
 using Recipe.API.DTOs;
+using Recipe.API.DTOs.Request;
 using Recipe.API.DTOs.Response;
 using Recipe.API.ExternalAPIs;
 using Recipe.API.Models;
 
 namespace Recipe.API.Services;
 
-public class RecipeService(IRecipeProvider recipeProvider, IMapper mapper) : IRecipeService
+public class RecipeService(IRecipeProvider recipeProvider, IMapper mapper,ICurrentUser currentUser, IRecipeRepository recipeRepository) : IRecipeService
 {
+    
     public async Task<RecipeSearchResponseDto> GetRecipes(RecipeRequestDto request)
     {
         if (request.Ingredients.Count == 0)
@@ -17,5 +21,40 @@ public class RecipeService(IRecipeProvider recipeProvider, IMapper mapper) : IRe
         //maybe redis cache here later
         var recipes = await recipeProvider.SearchRecipes(request);
         return mapper.Map<RecipeSearchResponseDto>(recipes);
+    }
+    
+    public async Task<SavedRecipeResponseDto> GetSavedRecipes()
+    {
+        if (string.IsNullOrEmpty(currentUser.UserId))
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+        
+        var recipes = await recipeRepository.GetUserSavedRecipes(currentUser.UserId);
+        return mapper.Map<SavedRecipeResponseDto>(recipes);
+    }
+    
+    public async Task SaveRecipe(SaveRecipeRequestDto recipeRequest)
+    {
+        if (string.IsNullOrEmpty(currentUser.UserId))
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+        
+        var recipe = await recipeRepository.FindByExternalId(recipeRequest.ExternalId);
+
+        if (recipe == null)
+        {
+            recipe = mapper.Map<Models.Recipe>(recipeRequest);
+            await recipeRepository.AddRecipe(recipe);
+        }
+        // Check if user has already saved this recipe
+        var userRecipe = new UserRecipe
+        {
+            UserId = currentUser.UserId,
+            RecipeId = recipe.Id,
+            Recipe = recipe
+        };
+        await recipeRepository.AddUserRecipe(userRecipe);
     }
 }

@@ -16,7 +16,6 @@ namespace Inventory.API.Data.Context.Configuration
 
             builder.HasMany(c => c.Products)
                 .WithMany(p => p.Categories);
-            ;
         }
     }
 }
