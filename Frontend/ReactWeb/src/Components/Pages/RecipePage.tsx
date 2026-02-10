@@ -9,7 +9,7 @@ export default function RecipePage() {
     const location = useLocation();
     const navigate = useNavigate();
     const ingredients = (location.state?.ingredients as Ingredient[]) || [];
-    const kitchenId = (location.state?.kitchenId as string) || [];
+    const kitchenId = (location.state?.kitchenId as string) || "";
     const filters = location.state?.filters || {};
 
     const [recipes, setRecipes] = useState<Recipe[]>([]);
@@ -17,11 +17,22 @@ export default function RecipePage() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
 
+    // Session likes from localStorage
+    const [sessionLikes, setSessionLikes] = useState<Recipe[]>(() => {
+        const saved = localStorage.getItem('sessionLikes');
+        return saved ? JSON.parse(saved) : [];
+    });
+
     const shownRecipeUrls = useRef<Set<string>>(new Set());
     const isFetchingRef = useRef(false);
 
     const preloadedImages = useRef<Set<string>>(new Set());
     const preloadBatchSize = 10;
+
+    // Save to localStorage whenever sessionLikes changes
+    useEffect(() => {
+        localStorage.setItem('sessionLikes', JSON.stringify(sessionLikes));
+    }, [sessionLikes]);
 
     const getSearchTerms = () => {
         const categories = ingredients
@@ -32,7 +43,7 @@ export default function RecipePage() {
         return [...new Set(categories)];
     };
 
-    // Preload images func
+    // Preload images function
     const preloadImages = (startIndex: number, count: number) => {
         const endIndex = Math.min(startIndex + count, recipes.length);
         
@@ -153,9 +164,25 @@ export default function RecipePage() {
     };
 
     const handleSwipeRight = () => {
+        // Add to session likes
+        const currentRecipe = recipes[currentIndex];
+        if (currentRecipe && !sessionLikes.some(r => r.url === currentRecipe.url)) {
+            setSessionLikes(prev => [...prev, currentRecipe]);
+        }
+
         const nextIndex = currentIndex + 1;
         setCurrentIndex(nextIndex);
         checkAndLoadMore(nextIndex);
+    };
+
+    const handleViewSessionLikes = () => {
+        navigate('/recipes/session-likes', {
+            state: { 
+                kitchenId,
+                ingredients,
+                filters
+            }
+        });
     };
 
     const handleRestart = () => {
@@ -239,9 +266,19 @@ export default function RecipePage() {
                         </p>
 
                         <div className="space-y-3">
+                            {sessionLikes.length > 0 && (
+                                <button 
+                                    onClick={handleViewSessionLikes}
+                                    className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                                >
+                                    <i className="fa-solid fa-heart"></i>
+                                    View {sessionLikes.length} Liked Recipe{sessionLikes.length !== 1 ? 's' : ''}
+                                </button>
+                            )}
+
                             <button 
                                 onClick={handleRestart}
-                                className="w-full py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-white border-2 border-primary text-primary rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
                             >
                                 <i className="fa-solid fa-rotate-right"></i>
                                 Start Over
@@ -249,7 +286,7 @@ export default function RecipePage() {
 
                             <button 
                                 onClick={() => navigate(`/kitchens/${kitchenId}`)}
-                                className="w-full py-3 bg-white border-2 border-primary text-primary rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
+                                className="w-full py-3 bg-white border-2 border-gray-300 text-gray-700 rounded-xl font-bold hover:bg-gray-50 transition-all flex items-center justify-center gap-2"
                             >
                                 <i className="fa-solid fa-house"></i>
                                 Go to Kitchen
@@ -264,7 +301,7 @@ export default function RecipePage() {
     return (
         <div className="min-h-screen flex flex-col bg-bg-secondary">
             {/* MOBILE HEADER */}
-            <div className="md:hidden p-4 flex items-center justify-between sticky top-0 z-10">
+            <div className="md:hidden p-4 flex items-center justify-between sticky top-0 z-10 bg-bg-secondary">
                 <button 
                     onClick={() => navigate(`/kitchens/${kitchenId}`)}
                     className="w-10 h-10 flex items-center justify-center bg-white rounded-full shadow-sm text-gray-600 hover:text-primary transition-colors"
@@ -278,7 +315,20 @@ export default function RecipePage() {
                     </p>
                 </div>
 
-                <div className="w-10" />
+                {/* Session Likes Badge - Mobile */}
+                {sessionLikes.length > 0 ? (
+                    <button
+                        onClick={handleViewSessionLikes}
+                        className="relative w-10 h-10 flex items-center justify-center bg-primary rounded-full shadow-lg text-white"
+                    >
+                        <i className="fa-solid fa-heart"></i>
+                        <span className="absolute -top-1 -right-1 bg-danger text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                            {sessionLikes.length}
+                        </span>
+                    </button>
+                ) : (
+                    <div className="w-10" />
+                )}
             </div>
 
             {/* DESKTOP HEADER */}
@@ -292,7 +342,7 @@ export default function RecipePage() {
                 </button>
 
                 <div className="flex-1 flex justify-center px-8">
-                    <div className="bg-linear-to-r from-primary/10 via-safe/10 to-primary/10 px-8 py-3 rounded-full border-2 border-primary/20 shadow-sm max-w-3xl">
+                    <div className="bg-gradient-to-r from-primary/10 via-safe/10 to-primary/10 px-8 py-3 rounded-full border-2 border-primary/20 shadow-sm max-w-3xl">
                         <p className="text-sm font-semibold text-gray-700 text-center flex items-center justify-center gap-2">
                             <i className="fa-solid fa-bowl-food text-primary"></i>
                             {ingredients.map(i => i.name).join(' • ')}
@@ -300,7 +350,18 @@ export default function RecipePage() {
                     </div>
                 </div>
 
-                <div className="w-24"></div>
+                {/* Session Likes Button - Desktop */}
+                {sessionLikes.length > 0 ? (
+                    <button
+                        onClick={handleViewSessionLikes}
+                        className="relative flex items-center gap-2 px-4 py-2 bg-primary text-white rounded-full shadow-lg hover:bg-primary-hover transition-all"
+                    >
+                        <i className="fa-solid fa-heart"></i>
+                        <span className="font-semibold">{sessionLikes.length} Liked</span>
+                    </button>
+                ) : (
+                    <div className="w-24"></div>
+                )}
             </div>
 
             {/* CARD AREA */}

@@ -17,7 +17,6 @@
   </ItemGroup>
   
   <ItemGroup>
-    <Folder Include="Data\Context\Configuration\" />
     <Folder Include="ExternalAPIs\Spoonacular\v1\DTOs\" />
   </ItemGroup>
 

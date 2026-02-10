@@ -4,6 +4,7 @@ import RecipePage from './Components/Pages/RecipePage'
 import AuthPage from './Components/Pages/AuthPage'
 import ProtectedRoute from './Components/Auth/ProtectedRoute'
 import KitchensPage from './Components/Pages/KitchensPage'
+import SessionLikesPage from './Components/Pages/SessionLikedPage'
 
 
 function RootRedirect() {
@@ -39,6 +40,12 @@ export default function App() {
         <Route path="/recipes" element={
           <ProtectedRoute>
             <RecipePage />
+          </ProtectedRoute>
+        } />
+
+        <Route path="/recipes/session-likes" element={
+          <ProtectedRoute>
+            <SessionLikesPage />
           </ProtectedRoute>
         } />
       

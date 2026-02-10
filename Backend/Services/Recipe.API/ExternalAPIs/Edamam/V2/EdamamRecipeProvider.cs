@@ -111,8 +111,8 @@ public class EdamamRecipeProvider(HttpClient httpClient, IOptions<Config.Edamam>
         var inputCount = request.Ingredients?.Count ?? 0;
         if (inputCount <= 0) return builder.ToString();
         
-        var maxIngr = inputCount + 8; //  for some add on ingredients like salt, oil, etc.
-        builder.Append($"&ingr=1-{maxIngr}");
+        // var maxIngr = inputCount + 8; //  for some add on ingredients like salt, oil, etc.
+        // builder.Append($"&ingr=1-{maxIngr}");
         builder.Append($"&random=true"); // to get more variety in results
         return builder.ToString();
     }

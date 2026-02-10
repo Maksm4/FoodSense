@@ -6,6 +6,7 @@ import { Button } from "../UI/Button";
 import { Input } from "../UI/Input";
 import { Popup } from "../UI/Popup";
 import KitchenList from "../Kitchen/KitchenList";
+import ProfilePopup from "../Profile/ProfilePopup";
 
 export default function KitchensPage() {
     const navigate = useNavigate();
@@ -64,9 +65,12 @@ export default function KitchensPage() {
         <PageContainer>
             <div className="flex justify-between items-center mb-6">
                 <h1 className="text-2xl font-bold text-gray-900">My Kitchens</h1>
-                {kitchens.length > 0 && (
-                    <Button onClick={() => setIsCreateOpen(true)}>+ Add New</Button>
-                )}
+                <div className="flex items-center gap-3">
+                    {kitchens.length > 0 && (
+                        <Button onClick={() => setIsCreateOpen(true)}>+ Add New</Button>
+                    )}
+                    <ProfilePopup />
+                </div>
             </div>
 
             {isLoading ? (

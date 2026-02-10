@@ -4,6 +4,7 @@ namespace Recipe.API.Models;
 
 public class Recipe
 {
+    public Guid Id { get; init; } = Guid.NewGuid();
     public string Title { get; set; } = string.Empty;
     public string Author { get; set; } = string.Empty;
     public string ImageUrl { get; set; } = string.Empty;
@@ -14,4 +15,5 @@ public class Recipe
     public CuisineType CuisineType { get; set; }
     public MealType MealType { get; set; }
     public ICollection<string> HealthLabels { get; init; } = [];
+    public string ExternalId { get; set; } = string.Empty;
 }
