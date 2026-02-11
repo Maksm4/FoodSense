@@ -10,7 +10,7 @@ namespace Inventory.API.Controllers
     [Route("api/inventory/kitchens")]
     [ApiController]
     [Authorize]
-    public class KitchenController(IKitchenService kitchenService) : ControllerBase
+    public class KitchenController(IKitchenService kitchenService, IKitchenInviteService kitchenInviteService) : ControllerBase
     {
         [HttpGet("{kitchenId:guid}")]
         [ProducesResponseType(typeof(KitchenResponseDTO), StatusCodes.Status200OK)]
@@ -50,6 +50,21 @@ namespace Inventory.API.Controllers
             await kitchenService.DeleteKitchen(kitchenId);
             return NoContent();
         }
+
+        [HttpPost("{kitchenId:guid}/invite")]
+        [ProducesResponseType(typeof(InviteLinkResponseDto), StatusCodes.Status201Created)]
+        public async Task<IActionResult> GenerateInviteLink([FromRoute] Guid kitchenId, [FromQuery] int expirationHours)
+        {
+            var inviteLink = await kitchenInviteService.GenerateInviteLink(kitchenId, expirationHours);
+            return Ok(inviteLink);
+        }
+
+        // [HttpPost]
+        // public async Task<IActionResult> JoinKitchenByLink([FromQuery] string inviteCode)
+        // {
+        //     await kitchenService.JoinKitchen(inviteCode);
+        //     return NoContent();
+        // }
     }
     
     // add option for inviting other users to kitchen

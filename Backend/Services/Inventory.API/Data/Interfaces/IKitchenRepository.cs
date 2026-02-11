@@ -7,5 +7,6 @@ namespace Inventory.API.Data.Interfaces
         Task<IEnumerable<Kitchen>> GetAll(string userId);
         public Task<bool> IsUserMember(Guid kitchenId, string userId);
         Task<bool> IsUserOwner(Guid kitchenId, string userId);
+        Task AddKitchenInvite(KitchenInvite invite);
     }
 }

@@ -29,5 +29,11 @@ namespace Inventory.API.Data.Repository
             return _context.UserKitchens
                 .AnyAsync(uk => uk.KitchenId == kitchenId && uk.UserId == userId && uk.Role == UserKitchenRole.Owner);
         }
+        
+        public async Task AddKitchenInvite(KitchenInvite invite)
+        {
+            await _context.KitchenInvites.AddAsync(invite);
+            await _context.SaveChangesAsync();
+        }
     }
 }

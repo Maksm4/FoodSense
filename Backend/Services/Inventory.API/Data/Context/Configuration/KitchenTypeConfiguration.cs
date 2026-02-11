@@ -26,6 +26,12 @@ namespace Inventory.API.Data.Context.Configuration
                 .HasForeignKey(uk => uk.KitchenId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Cascade);
+            
+            builder.HasMany(k => k.KitchenInvites)
+                .WithOne(ki => ki.Kitchen)
+                .HasForeignKey(ki => ki.KitchenId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }
