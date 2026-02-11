@@ -38,4 +38,17 @@ public class RecipeRepository(RecipeDbContext context) : IRecipeRepository
         context.UserRecipe.Add(userRecipe);
         await context.SaveChangesAsync();
     }
+    
+    public async Task DeleteUserRecipe(string userId, string externalId)
+    {
+        var userRecipe = await context.UserRecipe
+            .Include(ur => ur.Recipe)
+            .FirstOrDefaultAsync(ur => ur.UserId == userId && ur.Recipe.ExternalId == externalId);
+        
+        if (userRecipe != null)
+        {
+            context.UserRecipe.Remove(userRecipe);
+            await context.SaveChangesAsync();
+        }
+    }
 }

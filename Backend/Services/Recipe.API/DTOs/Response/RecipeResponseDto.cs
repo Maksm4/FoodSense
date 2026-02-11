@@ -14,4 +14,5 @@ public class RecipeResponseDto
     public MealType MealType { get; set; }
     public CuisineType CuisineType { get; set; } 
     public ICollection<string> HealthLabels { get; init; } = [];
+    public string ExternalId { get; set; } = string.Empty;
 }

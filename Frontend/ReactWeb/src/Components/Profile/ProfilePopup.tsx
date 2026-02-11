@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "../UI/Button";
 import { authService } from "../../api/authService";
+import { useNavigate } from "react-router-dom";
 
 interface ProfilePopupProps {
     userEmail?: string;
@@ -10,6 +11,7 @@ interface ProfilePopupProps {
 export default function ProfilePopup({ userEmail, userName }: ProfilePopupProps) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const navigate = useNavigate();
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -35,6 +37,11 @@ export default function ProfilePopup({ userEmail, userName }: ProfilePopupProps)
     const handleLogout = () => {
         setIsOpen(false);
         authService.logout();
+    };
+
+    const handleShowSavedRecipes = () => {
+        setIsOpen(false);
+        navigate('/recipes/saved');
     };
 
     return (
@@ -63,6 +70,14 @@ export default function ProfilePopup({ userEmail, userName }: ProfilePopupProps)
                     )}
 
                     <div className="py-2">
+                        {/* Saved Recipes */}
+                        <button
+                            onClick={handleShowSavedRecipes}
+                            className="w-full px-4 py-3 text-left flex items-center gap-3 hover:bg-bg-secondary transition-colors text-gray-700 hover:text-primary"
+                        >
+                            <i className="fa-solid fa-bookmark text-primary"></i>
+                            <span className="font-medium">Saved Recipes</span>
+                        </button>
                         {/* Reset Password */}
                         <button
                             onClick={handleResetPassword}

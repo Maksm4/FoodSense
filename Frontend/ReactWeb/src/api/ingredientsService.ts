@@ -1,4 +1,4 @@
-import { getUnitLabel } from "../Components/Ingredients/enums";
+import { getUnitLabel, Unit } from "../Components/Ingredients/enums";
 import type { Ingredient } from "../Data/Ingredient";
 import apiClient from "./apiClient";
 
@@ -33,7 +33,7 @@ function mapDtoToModel(dto: ProductItemResponse): Ingredient {
         id: dto.id,
         name: dto.productName || "Unknown",
         quantity: dto.quantity,
-        unit: dto.unit,
+        unit: dto.unit as Unit,
         brand: dto.brand,
         size: dto.productSize,
         unitLabel: getUnitLabel(dto.unit),

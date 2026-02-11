@@ -16,6 +16,7 @@ public class EdamamProfile : Profile
             .ForMember(dest => dest.Weight, opt => opt.MapFrom(src => src.Weight.ToString("0.##") + "g"));
 
         CreateMap<EdamamRecipeDto, Models.Recipe>()
+            .ForMember(dest => dest.ExternalId, opt => opt.MapFrom(src => ExtractExternalId(src.Uri)))
             .ForMember(dest => dest.Title, opt => opt.MapFrom(src => src.Label))
             .ForMember(dest => dest.Author, opt => opt.MapFrom(src => src.Source))
             .ForMember(dest => dest.ImageUrl, opt => opt.MapFrom(src => src.Image))
@@ -27,6 +28,13 @@ public class EdamamProfile : Profile
             .ForMember(dest => dest.MealType, opt => opt.MapFrom(src => MapMealType(src.MealType.FirstOrDefault())))
             .ForMember(dest => dest.CuisineType, opt => opt.MapFrom(src => MapCuisineType(src.CuisineType.FirstOrDefault())));
     }
+    
+    private static string ExtractExternalId(string edamamUri)
+    {
+        if (string.IsNullOrEmpty(edamamUri)) return string.Empty;
+        return edamamUri.Split("#recipe_").Last();
+    }
+    
     private static MealType MapMealType(string? mealType)
     {
         if (string.IsNullOrEmpty(mealType)) return MealType.Lunch;

@@ -35,7 +35,7 @@ export default function IngredientsPage() {
             setIsLoading(true);
             const data = await ingredientsService.getAll(kitchenId);
             setIngredients(data);
-        } catch (_) {
+        } catch {
             setError("Could not load kitchen inventory.");
         } finally {
             setIsLoading(false);
@@ -69,7 +69,7 @@ export default function IngredientsPage() {
         try {
             await ingredientsService.delete(kitchenId, id);
             setIngredients(prevData => prevData.filter(item => item.id !== id));
-        } catch (_) {
+        } catch {
             setError("Failed to delete item");
         }
     }
@@ -88,7 +88,7 @@ export default function IngredientsPage() {
                 item.id === itemId ? { ...item, quantity: newAmount } : item
             ));
 
-        } catch (_) {
+        } catch {
             setError("Failed to update quantity");
         }
     }

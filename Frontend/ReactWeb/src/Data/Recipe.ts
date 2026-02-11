@@ -36,27 +36,36 @@ export const CuisineType = {
 export type CuisineType = typeof CuisineType[keyof typeof CuisineType];
 
 export interface RecipeIngredient {
-    text: string;
-    quantity: number; 
-    measure: string;
-    weight: number;
+  text: string;
+  quantity: number; 
+  measure: string;
+  weight: number;
 }
 
 export interface Recipe {
-    id: string; 
-    title: string;
-    author: string;
-    image: string;
-    url: string;
-    time: number;
-    calories: number;
-    mealType: MealType;
-    cuisineType: CuisineType;
-    tags: string[];
-    ingredients: RecipeIngredient[];
+  id: string; 
+  title: string;
+  author: string;
+  image: string;
+  url: string;
+  time: number;
+  calories: number;
+  mealType: MealType;
+  cuisineType: CuisineType;
+  tags: string[];
+  ingredients: RecipeIngredient[];
 }
 
 export interface RecipeSearchResult {
-    items: Recipe[];
-    nextPageToken?: string;
+  items: Recipe[];
+  nextPageToken?: string;
+}
+
+export interface SavedRecipe {
+  id: string;
+  title: string;
+  author: string;
+  image: string;
+  url: string;
+  savedAt?: Date;
 }

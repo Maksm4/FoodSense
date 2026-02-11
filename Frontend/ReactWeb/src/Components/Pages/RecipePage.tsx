@@ -23,7 +23,7 @@ export default function RecipePage() {
         return saved ? JSON.parse(saved) : [];
     });
 
-    const shownRecipeUrls = useRef<Set<string>>(new Set());
+    const shownRecipeIds = useRef<Set<string>>(new Set());
     const isFetchingRef = useRef(false);
 
     const preloadedImages = useRef<Set<string>>(new Set());
@@ -77,11 +77,11 @@ export default function RecipePage() {
 
             // Filter out recipes already shown
             const newRecipes = (response.items || []).filter(
-                recipe => !shownRecipeUrls.current.has(recipe.url)
+                recipe => !shownRecipeIds.current.has(recipe.id)
             );
 
             newRecipes.forEach(recipe => {
-                shownRecipeUrls.current.add(recipe.url);
+                shownRecipeIds.current.add(recipe.id);
             });
 
             return newRecipes;
@@ -166,7 +166,7 @@ export default function RecipePage() {
     const handleSwipeRight = () => {
         // Add to session likes
         const currentRecipe = recipes[currentIndex];
-        if (currentRecipe && !sessionLikes.some(r => r.url === currentRecipe.url)) {
+        if (currentRecipe && !sessionLikes.some(r => r.id === currentRecipe.id)) {
             setSessionLikes(prev => [...prev, currentRecipe]);
         }
 
@@ -187,7 +187,7 @@ export default function RecipePage() {
 
     const handleRestart = () => {
         setCurrentIndex(0);
-        shownRecipeUrls.current.clear();
+        shownRecipeIds.current.clear();
         preloadedImages.current.clear();
         
         // Preload first batch again
@@ -342,7 +342,7 @@ export default function RecipePage() {
                 </button>
 
                 <div className="flex-1 flex justify-center px-8">
-                    <div className="bg-gradient-to-r from-primary/10 via-safe/10 to-primary/10 px-8 py-3 rounded-full border-2 border-primary/20 shadow-sm max-w-3xl">
+                    <div className="bg-linear-to-r from-primary/10 via-safe/10 to-primary/10 px-8 py-3 rounded-full border-2 border-primary/20 shadow-sm max-w-3xl">
                         <p className="text-sm font-semibold text-gray-700 text-center flex items-center justify-center gap-2">
                             <i className="fa-solid fa-bowl-food text-primary"></i>
                             {ingredients.map(i => i.name).join(' • ')}

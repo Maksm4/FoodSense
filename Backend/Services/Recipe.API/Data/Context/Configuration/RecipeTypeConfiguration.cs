@@ -27,5 +27,7 @@ public class RecipeTypeConfiguration : IEntityTypeConfiguration<Models.Recipe>
         builder.Ignore(r => r.PreparationTime);
         builder.Ignore(r => r.CuisineType);
         builder.Ignore(r => r.MealType);
+        
+        builder.HasIndex(r => r.ExternalId).IsUnique();
     }
 }

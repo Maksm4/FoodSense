@@ -1,5 +1,6 @@
 using AutoMapper;
 using Recipe.API.DTOs;
+using Recipe.API.DTOs.Request;
 using Recipe.API.DTOs.Response;
 using Recipe.API.Models;
 
@@ -12,5 +13,7 @@ public class RecipeProfile : Profile
         CreateMap<Models.Recipe, RecipeResponseDto>();
         CreateMap<Ingredient, IngredientResponseDto>();
         CreateMap<RecipeSearchResult, RecipeSearchResponseDto>();
+        CreateMap<SaveRecipeRequestDto, Models.Recipe>();
+        CreateMap<Models.Recipe, SavedRecipeResponseDto>();
     }
 }

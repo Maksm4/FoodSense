@@ -1,6 +1,7 @@
 import { useLocation, useNavigate } from "react-router-dom";
 import { useState, useEffect } from "react";
 import type { Recipe } from "../../Data/Recipe";
+import { recipeService } from "../../api/recipeService";
 
 export default function SessionLikesPage() {
     const location = useLocation();
@@ -15,30 +16,28 @@ export default function SessionLikesPage() {
         return saved ? JSON.parse(saved) : [];
     });
 
+    const [savingRecipeId, setSavingRecipeId] = useState<string | null>(null);
+
     // Update localStorage when sessionLikes changes
     useEffect(() => {
         localStorage.setItem('sessionLikes', JSON.stringify(sessionLikes));
     }, [sessionLikes]);
 
-    const handleRemove = (recipeUrl: string) => {
-        setSessionLikes(prev => prev.filter(r => r.url !== recipeUrl));
+    const handleRemove = (externalId: string) => {
+        setSessionLikes(prev => prev.filter(r => r.id !== externalId));
     };
 
     const handleSaveToFavorites = async (recipe: Recipe) => {
-        // TODO: Implement save to backend
-        console.log('Saving to favorites:', recipe);
-        alert(`"${recipe.title}" will be saved to favorites!`);
-        // await recipeService.saveToFavorites(recipe);
-    };
+        try {
+            setSavingRecipeId(recipe.id);
+            await recipeService.saveRecipe(recipe);
 
-    const handleSaveAll = async () => {
-        // TODO: Bulk save to backend
-        console.log('Saving all to favorites:', sessionLikes);
-        alert(`${sessionLikes.length} recipes will be saved to favorites!`);
-        
-        // Clear session likes after saving
-        localStorage.removeItem('sessionLikes');
-        navigate(`/kitchens/${kitchenId}`);
+            handleRemove(recipe.id);
+        } catch {
+            alert('Failed to save recipe. Please try again.');
+        } finally {
+            setSavingRecipeId(null);
+        }
     };
 
     const handleContinueBrowsing = () => {
@@ -51,11 +50,13 @@ export default function SessionLikesPage() {
         });
     };
 
+    const handleBackToKitchen = () => {
+        navigate(`/kitchens/${kitchenId}`);
+    };
+
     const handleClearAll = () => {
-        if (confirm('Are you sure you want to clear all session likes?')) {
-            setSessionLikes([]);
-            localStorage.removeItem('sessionLikes');
-        }
+        setSessionLikes([]);
+        localStorage.removeItem('sessionLikes');
     };
 
     if (sessionLikes.length === 0) {
@@ -65,12 +66,21 @@ export default function SessionLikesPage() {
                     <i className="fa-solid fa-heart-crack text-6xl text-gray-300 mb-4"></i>
                     <h2 className="text-2xl font-bold text-gray-800 mb-2">No Recipes Liked Yet</h2>
                     <p className="text-gray-500 mb-6">Start swiping to find recipes you love!</p>
-                    <button
-                        onClick={handleContinueBrowsing}
-                        className="w-full px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all shadow-lg shadow-primary/20"
-                    >
-                        Browse Recipes
-                    </button>
+                    <div className="flex flex-col gap-3">
+                        <button
+                            onClick={handleContinueBrowsing}
+                            className="w-full px-6 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary-hover transition-all shadow-lg shadow-primary/20"
+                        >
+                            Browse Recipes
+                        </button>
+
+                        <button
+                            onClick={handleBackToKitchen}
+                            className="w-full px-6 py-3 bg-white border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary/5 transition-all shadow-lg shadow-primary/20"
+                        >
+                            Back To Kitchen
+                        </button>
+                    </div>
                 </div>
             </div>
         );
@@ -100,6 +110,15 @@ export default function SessionLikesPage() {
                                 <i className="fa-solid fa-arrow-left"></i>
                                 <span className="hidden md:inline">Continue Browsing</span>
                             </button>
+
+                            <button
+                                onClick={handleBackToKitchen}
+                                className="px-4 py-2 bg-white border-2 border-primary text-primary rounded-xl font-semibold hover:bg-primary/5 transition-all flex items-center gap-2"
+                            >
+                                <i className="fa-solid fa-kitchen-set"></i>
+                                <span className="hidden md:inline">Back to Kitchen</span>
+                            </button>
+
                             
                             <button
                                 onClick={handleClearAll}
@@ -107,14 +126,6 @@ export default function SessionLikesPage() {
                             >
                                 <i className="fa-solid fa-trash"></i>
                                 <span className="hidden md:inline">Clear All</span>
-                            </button>
-
-                            <button
-                                onClick={handleSaveAll}
-                                className="px-4 py-2 bg-primary text-white rounded-xl font-semibold hover:bg-primary-hover transition-all shadow-lg shadow-primary/20 flex items-center gap-2"
-                            >
-                                <i className="fa-solid fa-bookmark"></i>
-                                Save All to Favorites
                             </button>
                         </div>
                     </div>
@@ -126,7 +137,7 @@ export default function SessionLikesPage() {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     {sessionLikes.map((recipe) => (
                         <div
-                            key={recipe.url}
+                            key={recipe.id}
                             className="bg-white rounded-2xl overflow-hidden shadow-lg border border-gray-200 hover:shadow-xl transition-all group"
                         >
                             {/* Image */}
@@ -191,19 +202,24 @@ export default function SessionLikesPage() {
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="flex-1 py-2 px-3 bg-bg-secondary text-gray-700 text-sm font-semibold rounded-lg hover:bg-gray-200 transition-colors text-center"
-                                        >
+                                    >
                                         <i className="fa-solid fa-arrow-up-right-from-square mr-1"></i>
                                         View Recipe
                                     </a>
                                     <button
                                         onClick={() => handleSaveToFavorites(recipe)}
-                                        className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all"
+                                        disabled={savingRecipeId === recipe.id}
+                                        className="px-3 py-2 bg-primary text-white rounded-lg hover:bg-primary-hover transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                                         title="Save to Favorites"
                                     >
-                                        <i className="fa-solid fa-bookmark"></i>
+                                        {savingRecipeId === recipe.id ? (
+                                            <i className="fa-solid fa-spinner fa-spin"></i>
+                                        ) : (
+                                            <i className="fa-solid fa-bookmark"></i>
+                                        )}
                                     </button>
                                     <button
-                                        onClick={() => handleRemove(recipe.url)}
+                                        onClick={() => handleRemove(recipe.id)}
                                         className="px-3 py-2 bg-danger/10 text-danger rounded-lg hover:bg-danger/20 transition-all"
                                         title="Remove"
                                     >

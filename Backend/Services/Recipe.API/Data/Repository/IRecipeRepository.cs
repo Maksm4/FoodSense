@@ -9,4 +9,5 @@ public interface IRecipeRepository
     Task<ICollection<Models.Recipe>> GetUserSavedRecipes(string userId);
     Task<Models.Recipe?> FindByExternalId(string externalId);
     Task AddUserRecipe(UserRecipe userRecipe);
+    Task DeleteUserRecipe(string userId, string externalId);
 }

@@ -8,7 +8,8 @@ namespace Recipe.API.Services;
 public interface IRecipeService
 {
     Task<RecipeSearchResponseDto> GetRecipes(RecipeRequestDto request);
-    Task<SavedRecipeResponseDto> GetSavedRecipes();
+    Task<ICollection<SavedRecipeResponseDto>> GetSavedRecipes();
     Task SaveRecipe(SaveRecipeRequestDto recipeRequest);
+    Task DeleteRecipe(string externalId);
 
 }

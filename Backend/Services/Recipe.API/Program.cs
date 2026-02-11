@@ -83,7 +83,7 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<RecipeDbContext>(); 
+        var context = services.GetRequiredService<RecipeDbContext>();
         if (context.Database.GetPendingMigrations().Any())
         {
             context.Database.Migrate();

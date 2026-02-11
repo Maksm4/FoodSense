@@ -99,7 +99,7 @@ public class EdamamRecipeProvider(HttpClient httpClient, IOptions<Config.Edamam>
         string[] requiredFields =
         [
             "label", "image", "source", "url", "calories", 
-            "totalTime", "healthLabels", "ingredients", "mealType", "cuisineType"
+            "totalTime", "healthLabels", "ingredients", "mealType", "cuisineType", "uri"
         ];
         
         foreach (var field in requiredFields)

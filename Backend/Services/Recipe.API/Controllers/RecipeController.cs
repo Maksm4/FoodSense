@@ -18,7 +18,7 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
         return Ok(recipes);
     }
     
-    [HttpGet]
+    [HttpGet("saved")]
     [ProducesResponseType(typeof(IEnumerable<SavedRecipeResponseDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public async Task<IActionResult> GetSavedRecipes()
@@ -27,9 +27,17 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
         return Ok(recipes);
     }
     
+    [HttpPost]
     public async Task<IActionResult> SaveRecipe([FromBody] SaveRecipeRequestDto request)
     {
         await recipeService.SaveRecipe(request);
+        return NoContent();
+    }
+    
+    [HttpDelete("{externalId}")]
+    public async Task<IActionResult> DeleteRecipe([FromRoute] string externalId)
+    {
+        await recipeService.DeleteRecipe(externalId);
         return NoContent();
     }
 }

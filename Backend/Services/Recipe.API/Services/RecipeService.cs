@@ -1,4 +1,5 @@
 using AutoMapper;
+using Common.Exceptions;
 using Common.Services;
 using Recipe.API.Data.Repository;
 using Recipe.API.DTOs;
@@ -23,7 +24,7 @@ public class RecipeService(IRecipeProvider recipeProvider, IMapper mapper,ICurre
         return mapper.Map<RecipeSearchResponseDto>(recipes);
     }
     
-    public async Task<SavedRecipeResponseDto> GetSavedRecipes()
+    public async Task<ICollection<SavedRecipeResponseDto>> GetSavedRecipes()
     {
         if (string.IsNullOrEmpty(currentUser.UserId))
         {
@@ -31,7 +32,7 @@ public class RecipeService(IRecipeProvider recipeProvider, IMapper mapper,ICurre
         }
         
         var recipes = await recipeRepository.GetUserSavedRecipes(currentUser.UserId);
-        return mapper.Map<SavedRecipeResponseDto>(recipes);
+        return mapper.Map<ICollection<SavedRecipeResponseDto>>(recipes);
     }
     
     public async Task SaveRecipe(SaveRecipeRequestDto recipeRequest)
@@ -56,5 +57,15 @@ public class RecipeService(IRecipeProvider recipeProvider, IMapper mapper,ICurre
             Recipe = recipe
         };
         await recipeRepository.AddUserRecipe(userRecipe);
+    }
+    
+    public async Task DeleteRecipe(string externalId)
+    {
+        if (string.IsNullOrEmpty(currentUser.UserId))
+        {
+            throw new UnauthorizedAccessException("User is not authenticated");
+        }
+        
+        await recipeRepository.DeleteUserRecipe(currentUser.UserId, externalId);
     }
 }

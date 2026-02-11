@@ -24,6 +24,7 @@ public class EdamamHitDto
 
 public class EdamamRecipeDto
 {
+    public string Uri { get; set; }
     public string Label { get; set; }
     public string Source { get; set; } 
     public string Image { get; set; }
