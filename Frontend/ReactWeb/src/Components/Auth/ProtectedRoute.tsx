@@ -1,15 +1,21 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
+import { useAuth } from '../../context/useAuth';
 
-interface ProtectedRouteProps {
-  children: React.ReactNode;
-}
+export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+    const { isAuthenticated, isLoading } = useAuth();
+    const location = useLocation();
 
-export default function ProtectedRoute({ children }: ProtectedRouteProps) {
-  const token = localStorage.getItem('jwt_token');
+    if (isLoading) {
+        return (
+            <div className="min-h-screen flex items-center justify-center">
+                <i className="fa-solid fa-circle-notch fa-spin text-4xl text-primary"></i>
+            </div>
+        );
+    }
 
-  if (!token) {
-    return <Navigate to="/auth" replace />;
-  }
+    if (!isAuthenticated) {
+        return <Navigate to={`/auth?returnUrl=${encodeURIComponent(location.pathname)}`} replace />;
+    }
 
-  return <>{children} </>;
+    return <>{children}</>;
 }

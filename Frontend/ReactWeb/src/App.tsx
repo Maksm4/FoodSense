@@ -6,15 +6,16 @@ import ProtectedRoute from './Components/Auth/ProtectedRoute'
 import KitchensPage from './Components/Pages/KitchensPage'
 import SessionLikesPage from './Components/Pages/SessionLikedPage'
 import SavedRecipesPage from './Components/Pages/SavedRecipesPage'
+import { useAuth } from './context/useAuth'
+import JoinKitchenPage from './Components/Pages/JoinKitchenPage'
 
 
 function RootRedirect() {
-  const isAuthenticated = !!localStorage.getItem("jwt_token");
+const { isAuthenticated, isLoading } = useAuth();
 
-  if (isAuthenticated) {
-    return <Navigate to="/kitchens" replace />;
-  }
-  return <Navigate to="/auth" replace />;
+  if (isLoading) return null;
+
+  return isAuthenticated ? <Navigate to="/kitchens" replace /> : <Navigate to="/auth" replace />;
 }
 
 export default function App() {
@@ -25,6 +26,7 @@ export default function App() {
         <Routes>
           <Route path="/auth" element={<AuthPage />} />
           <Route path="/" element={<RootRedirect />} />
+          <Route path="/join/:inviteCode" element={<JoinKitchenPage />} />
 
           <Route path="/kitchens/:kitchenId" element={
           <ProtectedRoute>

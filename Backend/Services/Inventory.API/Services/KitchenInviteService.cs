@@ -5,6 +5,7 @@ using Inventory.API.Data.Interfaces;
 using Inventory.API.DTOs.Response;
 using Inventory.API.Models;
 using Inventory.API.Services.Interfaces;
+using Microsoft.EntityFrameworkCore;
 
 namespace Inventory.API.Services;
 
@@ -28,17 +29,59 @@ public class KitchenInviteService(ICurrentUser currentUser, IKitchenRepository k
         {
             throw new NotFoundException("kitchen not found or no permission to generate invite link");
         }
-        
-        //for now based on GUID
-        var inviteCode  = Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
-        var invite = new KitchenInvite
+        const int maxRetries = 3;
+        var retries = 0;
+
+        while (true)
         {
-            KitchenId = kitchenId.Value,
-            InviteCode = inviteCode,
-            ExpiresAt = DateTime.UtcNow.AddHours(expirationHours),
-            CreatedByUserId = userId
+            var inviteCode = GenerateInviteCode();
+
+            var invite = new KitchenInvite
+            {
+                KitchenId = kitchenId.Value,
+                InviteCode = inviteCode,
+                ExpiresAt = DateTime.UtcNow.AddHours(expirationHours),
+                CreatedByUserId = userId
+            };
+            try
+            {
+                await kitchenRepository.AddKitchenInvite(invite);
+                return mapper.Map<InviteLinkResponseDto>(invite);
+            }
+            catch (DbUpdateException)
+            {
+                retries++;
+                if (retries > maxRetries) throw new Exception("System is busy, please try again.");
+            }
+        }
+    }
+
+    public async Task JoinKitchenByLink(string inviteCode)
+    {
+        var userId = currentUser.UserId;
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException("User is not authenticated.");
+        }
+        
+        var invite = await kitchenRepository.GetKitchenInvite(inviteCode);
+        if (invite == null || invite.ExpiresAt < DateTime.UtcNow)
+        {
+            throw new NotFoundException("Invalid or expired invite code");
+        }
+
+        var userKitchen = new UserKitchen
+        {
+            KitchenId = invite.KitchenId,
+            UserId = userId,
+            Role = UserKitchenRole.Member
         };
-        await kitchenRepository.AddKitchenInvite(invite);
-        return mapper.Map<InviteLinkResponseDto>(invite);
+        
+        await kitchenRepository.AddUserKitchen(userKitchen);
+    }
+    
+    private string GenerateInviteCode()
+    {
+        return Guid.NewGuid().ToString("N").Substring(0, 8).ToUpper();
     }
 }

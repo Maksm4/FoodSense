@@ -31,8 +31,8 @@ public class RecipeService(IRecipeProvider recipeProvider, IMapper mapper,ICurre
             throw new UnauthorizedAccessException("User is not authenticated");
         }
         
-        var recipes = await recipeRepository.GetUserSavedRecipes(currentUser.UserId);
-        return mapper.Map<ICollection<SavedRecipeResponseDto>>(recipes);
+        var userRecipes = await recipeRepository.GetUserSavedRecipes(currentUser.UserId);
+        return mapper.Map<ICollection<SavedRecipeResponseDto>>(userRecipes);
     }
     
     public async Task SaveRecipe(SaveRecipeRequestDto recipeRequest)

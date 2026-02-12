@@ -30,10 +30,5 @@ export const authService = {
     register: async (data: RegisterRequest) => {
         const response = await apiClient.post<RegisterResponse>('/register', data);
         return response.data;
-    },
-    
-    logout: () => {
-        localStorage.removeItem('jwt_token');
-        window.location.href = '/auth';
     }
 };

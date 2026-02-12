@@ -19,11 +19,12 @@ public class RecipeRepository(RecipeDbContext context) : IRecipeRepository
         await context.SaveChangesAsync();
     }
 
-    public async Task<ICollection<Models.Recipe>> GetUserSavedRecipes(string userId)
+    public async Task<ICollection<UserRecipe>> GetUserSavedRecipes(string userId)
     {
-        return await context.Recipes
-            .Include(r => r.UserRecipes)
-            .Where(r => r.UserRecipes.Any(ur => ur.UserId == userId))
+        return await context.UserRecipe
+            .Include(ur => ur.Recipe)
+            .Where(ur => ur.UserId == userId)
+            .OrderByDescending(ur => ur.SavedAt)
             .ToListAsync();
     }
 

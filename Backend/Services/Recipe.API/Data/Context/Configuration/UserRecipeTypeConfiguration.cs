@@ -11,6 +11,7 @@ public class UserRecipeTypeConfiguration : IEntityTypeConfiguration<UserRecipe>
         builder.ToTable("UserRecipe");
         builder.HasKey(ur => ur.Id).HasName("PK_UserRecipe");
         builder.Property(ur => ur.Id).ValueGeneratedOnAdd();
+        builder.Property(ur => ur.SavedAt).IsRequired();
         
         builder.HasIndex(ur => ur.UserId);
     }

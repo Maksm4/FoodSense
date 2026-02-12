@@ -19,7 +19,7 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
 
     const [quantity, setQuantity] = useState(1);
     const [productSize, setProductSize] = useState(0);
-    const [unit, setUnit] = useState("");
+    const [unit, setUnit] = useState<string>(Unit.Pcs);
 
     const [price, setPrice] = useState(0);
     const [purchaseDate, setPurchaseDate] = useState(new Date().toISOString().split('T')[0]);

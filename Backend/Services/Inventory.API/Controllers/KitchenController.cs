@@ -59,13 +59,11 @@ namespace Inventory.API.Controllers
             return Ok(inviteLink);
         }
 
-        // [HttpPost]
-        // public async Task<IActionResult> JoinKitchenByLink([FromQuery] string inviteCode)
-        // {
-        //     await kitchenService.JoinKitchen(inviteCode);
-        //     return NoContent();
-        // }
+        [HttpPost("join")]
+        public async Task<IActionResult> JoinKitchenByLink([FromQuery] string inviteCode)
+        {
+            await kitchenInviteService.JoinKitchenByLink(inviteCode);
+            return NoContent();
+        }
     }
-    
-    // add option for inviting other users to kitchen
 }

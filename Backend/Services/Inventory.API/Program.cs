@@ -24,6 +24,7 @@ builder.Services.AddDbContext<InventoryDbContext>(
 builder.Services.AddScoped<IKitchenService, KitchenService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductItemService, ProductItemService>();
+builder.Services.AddScoped<IKitchenInviteService, KitchenInviteService>();
 
 //repositories
 builder.Services.AddScoped<IKitchenRepository, KitchenRepository>();

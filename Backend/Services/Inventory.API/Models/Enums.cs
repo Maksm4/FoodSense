@@ -2,7 +2,7 @@
 {
     public enum Unit
     {
-        pieces,
+        pcs,
         ml,
         L,
         g,

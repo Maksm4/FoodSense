@@ -15,9 +15,7 @@ namespace Inventory.API.MapperProfiles
                         src.UserKitchens.Select(uk => uk.UserId) //change it to username
                 ));
 
-            CreateMap<KitchenInvite, InviteLinkResponseDto>()
-                .ForMember(dest => dest.InviteLink,
-                    opt => opt.MapFrom(src => $"{src.KitchenId}/invite/{src.InviteCode}"));
+            CreateMap<KitchenInvite, InviteLinkResponseDto>();
         }
     }
 }

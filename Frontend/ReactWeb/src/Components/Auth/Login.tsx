@@ -1,9 +1,12 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { authService } from '../../api/authService';
+import { useAuth } from '../../context/useAuth';
 
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login } = useAuth();
   const [formData, setFormData] = useState({
     email: '',
     password: '',
@@ -19,7 +22,7 @@ export default function Login() {
     setError('');
   };
 
-  const handleSubmit = async (e: any) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
     
@@ -31,11 +34,15 @@ export default function Login() {
     try {
       setIsLoading(true);
       const response = await authService.login(formData);
+      login(response.token);
+
+      const returnUrl = searchParams.get('returnUrl');
       
-      localStorage.setItem('jwt_token', response.token);
-      navigate('/kitchens');
+      navigate(returnUrl || '/kitchens');
+
     } catch (err: any) {
       setError(err.response?.data?.message || 'Invalid email or password');
+    } finally {
       setIsLoading(false);
     }
   };

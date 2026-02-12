@@ -7,4 +7,5 @@ public class SavedRecipeResponseDto
     public string ImageUrl { get; set; } = string.Empty;
     public string SourceUrl { get; set; } = string.Empty;
     public string ExternalId { get; set; } = string.Empty;
+    public DateOnly? SavedAt { get; set; }
 }

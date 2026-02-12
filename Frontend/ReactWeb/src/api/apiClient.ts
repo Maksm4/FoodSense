@@ -8,7 +8,6 @@ const apiClient = axios.create({
   },
 });
 
-// add JWT token
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('jwt_token');
@@ -32,7 +31,8 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401 && !window.location.pathname.includes('/auth')) {
       localStorage.removeItem('jwt_token');
-      window.location.href = '/auth';
+      const currentPath = window.location.pathname + window.location.search;
+      window.location.href = `/auth?returnUrl=${encodeURIComponent(currentPath)}`;
     }
     
     return Promise.reject(error);

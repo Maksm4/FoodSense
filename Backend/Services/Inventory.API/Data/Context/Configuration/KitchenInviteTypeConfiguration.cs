@@ -11,9 +11,11 @@ public class KitchenInviteTypeConfiguration : IEntityTypeConfiguration<KitchenIn
         builder.ToTable("KitchenInvite");
         builder.HasKey(c => c.Id).HasName("PK_KitchenInvite");
         builder.Property(c => c.Id).ValueGeneratedOnAdd();
-        builder.Property(c => c.InviteCode).IsRequired();
         builder.Property(c => c.CreatedAt).IsRequired();
         builder.Property(c => c.CreatedByUserId).IsRequired();
         builder.Property(c => c.ExpiresAt).IsRequired();
+        
+        
+        builder.HasIndex(c => c.InviteCode).IsUnique();
     }
 }

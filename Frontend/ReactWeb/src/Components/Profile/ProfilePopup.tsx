@@ -1,7 +1,7 @@
 import { useState, useRef, useEffect } from "react";
 import { Button } from "../UI/Button";
-import { authService } from "../../api/authService";
 import { useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/useAuth";
 
 interface ProfilePopupProps {
     userEmail?: string;
@@ -11,6 +11,7 @@ interface ProfilePopupProps {
 export default function ProfilePopup({ userEmail, userName }: ProfilePopupProps) {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
+    const { logout } = useAuth();
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -36,7 +37,7 @@ export default function ProfilePopup({ userEmail, userName }: ProfilePopupProps)
 
     const handleLogout = () => {
         setIsOpen(false);
-        authService.logout();
+        logout();
     };
 
     const handleShowSavedRecipes = () => {

@@ -6,4 +6,5 @@ public class UserRecipe
     public string UserId { get; set; } = string.Empty;
     public Guid RecipeId { get; set; }
     public Recipe Recipe { get; init; }
+    public DateOnly SavedAt { get; set; } = DateOnly.FromDateTime(DateTime.Today);
 }
