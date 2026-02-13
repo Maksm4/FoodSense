@@ -16,8 +16,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<RecipeDbContext>(
-        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
+        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+        sqlOptions => sqlOptions.EnableRetryOnFailure(
+            maxRetryCount: 5,
+            maxRetryDelay: TimeSpan.FromSeconds(10),
+            errorNumbersToAdd: null)
+        ));
 
 //services
 builder.Services.AddScoped<IRecipeService, RecipeService>();
@@ -84,10 +88,7 @@ using (var scope = app.Services.CreateScope())
     try
     {
         var context = services.GetRequiredService<RecipeDbContext>();
-        if (context.Database.GetPendingMigrations().Any())
-        {
-            context.Database.Migrate();
-        }
+        context.Database.Migrate();
     }
     catch (Exception ex)
     {

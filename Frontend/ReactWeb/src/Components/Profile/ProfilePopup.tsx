@@ -3,12 +3,7 @@ import { Button } from "../UI/Button";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../../context/useAuth";
 
-interface ProfilePopupProps {
-    userEmail?: string;
-    userName?: string;
-}
-
-export default function ProfilePopup({ userEmail, userName }: ProfilePopupProps) {
+export default function ProfilePopup() {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
     const { logout } = useAuth();

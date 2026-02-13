@@ -3,7 +3,7 @@ using System.Text.Json.Serialization;
 using Common.Middlewares;
 using Common.Services;
 using Inventory.API.Data.Context;
-using Inventory.API.Data.Context.Data;
+using Inventory.API.Data.Context.Seeder;
 using Inventory.API.Data.Interfaces;
 using Inventory.API.Data.Repository;
 using Inventory.API.MapperProfiles;
@@ -17,14 +17,20 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<InventoryDbContext>(
-        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
+        opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+            sqlOptions => sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null)
+            )
+        );
 
 //services
 builder.Services.AddScoped<IKitchenService, KitchenService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductItemService, ProductItemService>();
 builder.Services.AddScoped<IKitchenInviteService, KitchenInviteService>();
+builder.Services.AddScoped<CsvProductSeeder>();
 
 //repositories
 builder.Services.AddScoped<IKitchenRepository, KitchenRepository>();
@@ -78,24 +84,22 @@ using (var scope = app.Services.CreateScope())
     var services = scope.ServiceProvider;
     try
     {
-        var context = services.GetRequiredService<InventoryDbContext>(); 
-        if (context.Database.GetPendingMigrations().Any())
+        var context = services.GetRequiredService<InventoryDbContext>();
+        var seeder = services.GetRequiredService<CsvProductSeeder>();
+       
+        context.Database.Migrate();
+        var csvPath = Path.Combine(AppContext.BaseDirectory, "Data", "Seeding", "off_products.csv");
+        
+        if (File.Exists(csvPath) && !context.Products.Any())
         {
-            context.Database.Migrate();
+            await seeder.SeedFromCsvAsync(csvPath);
         }
     }
     catch (Exception ex)
     {
         var logger = services.GetRequiredService<ILogger<Program>>();
-        logger.LogError(ex, "An error occurred while migrating the database");
+        logger.LogError(ex, "An error occurred during database migration/seeding");
     }
 }
 
-using (var scope = app.Services.CreateScope())
-{
-    var context = scope.ServiceProvider.GetRequiredService<InventoryDbContext>();
-    
-    context.Database.EnsureCreated(); 
-    DataSeeder.Seed(context);
-}
 app.Run();

@@ -146,6 +146,8 @@ namespace Inventory.API.Migrations
                     b.HasKey("Id")
                         .HasName("PK_Product");
 
+                    b.HasIndex("Name");
+
                     b.ToTable("Product", (string)null);
                 });
 
@@ -212,6 +214,10 @@ namespace Inventory.API.Migrations
                     b.Property<string>("UserId")
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
+
+                    b.Property<string>("Username")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id")
                         .HasName("PK_UserKitchen");

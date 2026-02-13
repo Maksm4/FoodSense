@@ -11,7 +11,7 @@ export interface ProductResponse {
 export const productService = {
     search: async (query: string) => {
         const response = await apiClient.get<ProductResponse[]>(`/products`, {
-            params: { search: query, limit: 5 }
+            params: { search: query, limit: 10 }
         });
         return response.data;
     }

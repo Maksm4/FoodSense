@@ -74,6 +74,7 @@ public class KitchenInviteService(ICurrentUser currentUser, IKitchenRepository k
         {
             KitchenId = invite.KitchenId,
             UserId = userId,
+            Username = currentUser.UserName ?? "",
             Role = UserKitchenRole.Member
         };
         

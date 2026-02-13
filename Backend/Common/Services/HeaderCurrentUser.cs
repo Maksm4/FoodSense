@@ -5,14 +5,8 @@ namespace Common.Services;
 
 public class HeaderCurrentUser(IHttpContextAccessor httpContextAccessor) : ICurrentUser
 {
-    public string? UserId
-    {
-        get
-        {
-            var user = httpContextAccessor.HttpContext?.User;
+    private ClaimsPrincipal? User => httpContextAccessor.HttpContext?.User;
+    public string? UserId => User?.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            return user?.FindFirstValue(ClaimTypes.NameIdentifier)
-                   ?? null;
-        }
-    }
+    public string? UserName => User?.FindFirstValue(ClaimTypes.Name);
 }

@@ -37,7 +37,7 @@ export default function AddItemPopup({ isOpen, onClose, onAdded, kitchenId }: Ad
             } else {
                 setSearchResults([]);
             }
-        }, 300);
+        }, 700);
 
         return () => clearTimeout(delayDebounce);
     }, [searchQuery]);

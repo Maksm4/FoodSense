@@ -23,6 +23,8 @@ namespace Inventory.API.Data.Context.Configuration
                 .HasForeignKey(pi => pi.ProductId)
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
+
+            builder.HasIndex(p => p.Name);
         }
     }
 }

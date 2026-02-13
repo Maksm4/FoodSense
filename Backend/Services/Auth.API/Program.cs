@@ -15,7 +15,12 @@ public class Program
         builder.Services.AddControllers();
         builder.Services.AddOpenApi();
         builder.Services.AddDbContext<AuthDbContext>(options =>
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"),
+            sqlOptions => sqlOptions.EnableRetryOnFailure(
+                maxRetryCount: 5,
+                maxRetryDelay: TimeSpan.FromSeconds(10),
+                errorNumbersToAdd: null)
+            ));
 
         builder.Services.AddIdentityCore<IdentityUser>(options => 
             {
@@ -47,10 +52,7 @@ public class Program
             try
             {
                 var context = services.GetRequiredService<AuthDbContext>(); 
-                if (context.Database.GetPendingMigrations().Any())
-                {
-                    context.Database.Migrate();
-                }
+                context.Database.Migrate();
             }
             catch (Exception ex)
             {

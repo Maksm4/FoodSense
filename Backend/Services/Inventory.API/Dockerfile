@@ -21,4 +21,9 @@ RUN dotnet publish "./Inventory.API.csproj" -c $BUILD_CONFIGURATION -o /app/publ
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+
+RUN mkdir -p Data/Seeding
+
+COPY ["Services/Inventory.API/Data/Context/Seeder/off_products.csv", "Data/Seeding/"]
+
 ENTRYPOINT ["dotnet", "Inventory.API.dll"]
