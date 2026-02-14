@@ -11,11 +11,11 @@ namespace Inventory.API.Data.Context.Configuration
             builder.ToTable("Category");
 
             builder.HasKey(c => c.Id).HasName("PK_Category");
-            builder.Property(c => c.Name).IsRequired().HasMaxLength(100);
+            builder.Property(c => c.PolishName).IsRequired().HasMaxLength(200);
+            builder.Property(c => c.EnglishName).IsRequired().HasMaxLength(200);
             builder.Property(c => c.Id).ValueGeneratedOnAdd();
-
-            builder.HasMany(c => c.Products)
-                .WithMany(p => p.Categories);
+            
+            builder.HasIndex(c => c.PolishName).IsUnique();
         }
     }
 }

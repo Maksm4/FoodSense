@@ -14,7 +14,6 @@ namespace Inventory.API.Data.Context
         public DbSet<ProductItem> ProductItems { get; set; }
         public DbSet<UserKitchen> UserKitchens { get; set; }
         public DbSet<KitchenInvite> KitchenInvites { get; set; }
-
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
@@ -24,7 +23,7 @@ namespace Inventory.API.Data.Context
             modelBuilder.ApplyConfiguration(new KitchenTypeConfiguration());
             modelBuilder.ApplyConfiguration(new UserKitchensTypeConfiguration());
             modelBuilder.ApplyConfiguration(new ProductItemTypeConfiguration());
-            modelBuilder.ApplyConfiguration(new KitchenInviteTypeConfiguration());  
+            modelBuilder.ApplyConfiguration(new KitchenInviteTypeConfiguration());
         }
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)

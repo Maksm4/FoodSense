@@ -8,14 +8,14 @@ public static class FakeDataSeeder
     {
         if (context.Products.Any()) return;
 
-        var catDairy = new Category { Name = "en:dairies" };
-        var catMilk = new Category { Name = "en:milks" };
-        var catBeverages = new Category { Name = "en:beverages" };
-        var catSnacks = new Category { Name = "en:snacks" };
-        var catPlantBased = new Category { Name = "en:plant-based-foods" };
-        var catMeat = new Category { Name = "en:chickens" };
-        var catChickenBreasts = new Category { Name = "en:chicken-breasts" };
-        var catCottageCheese = new Category { Name = "en:plain-cottage" };
+        var catDairy = new Category { EnglishName = "en:dairies" };
+        var catMilk = new Category { EnglishName = "en:milks" };
+        var catBeverages = new Category { EnglishName = "en:beverages" };
+        var catSnacks = new Category { EnglishName = "en:snacks" };
+        var catPlantBased = new Category { EnglishName = "en:plant-based-foods" };
+        var catMeat = new Category { EnglishName = "en:chickens" };
+        var catChickenBreasts = new Category { EnglishName = "en:chicken-breasts" };
+        var catCottageCheese = new Category { EnglishName = "en:plain-cottage" };
         
         var products = new List<Product>
         {
@@ -78,7 +78,7 @@ public static class FakeDataSeeder
                 Name = "Piers z Kurczaka",
                 Brand = "Kraina Mies",
                 BarCode = "95900757060891",
-                Categories = new List<Category> { catMeat, catChickenBreasts },
+                Categories = new List<Category> {catMeat, catChickenBreasts},
                 Scope = ProductScope.Global,
                 CreatedBy = "Admin",
                 VisualRepresentation = "https://images.openfoodfacts.org/images/products/590/077/788/8999/front_pl.5.400.jpg"
