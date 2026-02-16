@@ -24,6 +24,15 @@ namespace Inventory.API.Data.Context.Configuration
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
+            builder.HasMany(p => p.Categories)
+                .WithMany(pi => pi.Products)
+                .UsingEntity(j => j.ToTable("ProductCategories"));
+            
+            builder.HasOne(p => p.MainCategory)
+                .WithMany()
+                .HasForeignKey(p => p.MainCategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+            
             builder.HasIndex(p => p.Name);
         }
     }

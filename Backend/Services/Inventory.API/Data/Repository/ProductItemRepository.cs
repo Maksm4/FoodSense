@@ -16,6 +16,8 @@ namespace Inventory.API.Data.Repository
             return await _context.ProductItems
                 .Include(pi => pi.Product)
                 .ThenInclude(p => p.Categories)
+                .Include(pi => pi.Product)
+                .ThenInclude(p => p.MainCategory)
                 .Where(pi => pi.KitchenId == kitchenId && pi.Id == itemId)
                 .FirstOrDefaultAsync();
         }
@@ -26,6 +28,8 @@ namespace Inventory.API.Data.Repository
             return await _context.ProductItems
                 .Include(pi => pi.Product)
                 .ThenInclude(p => p.Categories)
+                .Include(pi => pi.Product)
+                .ThenInclude(p => p.MainCategory)
                 .Where(p => p.KitchenId == kitchenId)
                 .ApplySorting(sortStrategy, ascending)
                 .ToListAsync();

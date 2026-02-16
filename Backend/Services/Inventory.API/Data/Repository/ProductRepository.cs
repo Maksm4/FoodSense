@@ -17,6 +17,14 @@ namespace Inventory.API.Data.Repository
                 .ToListAsync();
         }
 
+        public async Task<Product?> GetProductById(Guid productId, string? userId)
+        {
+            return await _context.Products
+                .Where(p => p.Id == productId && (p.Scope == ProductScope.Global || (userId != null && p.CreatedBy == userId)))
+                .Include(p => p.MainCategory)
+                .FirstOrDefaultAsync();
+        }
+
         public async Task<bool> IsProductOwnedByUser(Guid productId, string userId)
         {
             return await _context.Products

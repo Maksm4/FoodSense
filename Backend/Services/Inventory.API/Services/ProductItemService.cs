@@ -10,7 +10,7 @@ using Inventory.API.Services.Interfaces;
 namespace Inventory.API.Services
 {
     public class ProductItemService(IProductItemRepository productItemRepository, IKitchenRepository kitchenRepository, 
-        ICurrentUser currentUser, IMapper mapper) : IProductItemService
+        IProductRepository productRepository, IPolishToEnglishTranslator translator, ICurrentUser currentUser, IMapper mapper) : IProductItemService
     {
         public async Task<ProductItemResponseDTO> GetItemFromKitchen(Guid? kitchenId, Guid? itemId)
         {
@@ -58,6 +58,22 @@ namespace Inventory.API.Services
             
             var productItemEntity = mapper.Map<ProductItem>(itemDto);
             productItemEntity.KitchenId = kitchenId!.Value;
+            
+            //check if product has english name, if not translate it 
+            var product = await productRepository.GetProductById(productItemEntity.ProductId, userId);
+
+            if (product == null)
+            {
+                throw new NotFoundException("product not found");
+            }
+
+            if (product.MainCategory != null && string.IsNullOrEmpty(product.MainCategory.EnglishName))
+            {
+                var polishName = product.MainCategory.PolishName;
+                var englishName = await translator.Translate(polishName);
+
+                product.MainCategory.EnglishName = englishName;
+            }
             
             await productItemRepository.Add(productItemEntity);
             await productItemRepository.SaveChanges();

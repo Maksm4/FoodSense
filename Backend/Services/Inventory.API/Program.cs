@@ -9,6 +9,7 @@ using Inventory.API.Data.Repository;
 using Inventory.API.MapperProfiles;
 using Inventory.API.Services;
 using Inventory.API.Services.Interfaces;
+using Inventory.API.Services.Translator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
@@ -31,6 +32,7 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductItemService, ProductItemService>();
 builder.Services.AddScoped<IKitchenInviteService, KitchenInviteService>();
 builder.Services.AddScoped<CsvProductSeeder>();
+builder.Services.AddSingleton<IPolishToEnglishTranslator, AzurePolishToEnglishTranslator>();
 
 //repositories
 builder.Services.AddScoped<IKitchenRepository, KitchenRepository>();
@@ -86,13 +88,14 @@ using (var scope = app.Services.CreateScope())
     {
         var context = services.GetRequiredService<InventoryDbContext>();
         var seeder = services.GetRequiredService<CsvProductSeeder>();
-       
+        
+        context.Database.EnsureDeleted(); //temp
         context.Database.Migrate();
         var csvPath = Path.Combine(AppContext.BaseDirectory, "Data", "Seeding", "off_products.csv");
         
         if (File.Exists(csvPath) && !context.Products.Any())
         {
-            await seeder.SeedFromCsvAsync(csvPath);
+            await seeder.SeedFromCsv(csvPath);
         }
     }
     catch (Exception ex)
