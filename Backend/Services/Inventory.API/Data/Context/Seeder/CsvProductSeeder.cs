@@ -9,7 +9,7 @@ namespace Inventory.API.Data.Context.Seeder;
 
 public class CsvProductSeeder(InventoryDbContext context)
 {
-    public async Task SeedFromCsvAsync(string csvFilePath)
+    public async Task SeedFromCsv(string csvFilePath)
     {
         var strategy = context.Database.CreateExecutionStrategy();
         var categoryCache = await context.Set<Category>()

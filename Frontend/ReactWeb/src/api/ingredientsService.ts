@@ -21,6 +21,7 @@ export interface ProductItemResponse {
     productName: string;
     productSize: number;
     mainCategory: string;
+    imageUrl: string;
     brand: string;
     quantity: number;
     unit: string;
@@ -39,7 +40,8 @@ function mapDtoToModel(dto: ProductItemResponse): Ingredient {
         unitLabel: getUnitLabel(dto.unit),
         expirationDate: expiry,
         isExpired: expiry < new Date(),
-        mainCategory: dto.mainCategory
+        mainCategory: dto.mainCategory,
+        imageUrl: dto.imageUrl
     };
 }
 

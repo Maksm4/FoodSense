@@ -1,4 +1,4 @@
-import { useRef } from "react";
+import { useRef, useState } from "react";
 import type { Ingredient } from "../../Data/Ingredient";
 import { Badge, type BadgeColor } from "../UI/Badge";
 import { Card } from "../UI/Card";
@@ -6,8 +6,8 @@ import { Unit } from "./enums";
 
 interface IngredientItemProps {
     ingredient: Ingredient;
-    mode: string,
-    isSelected: boolean,
+    mode: string;
+    isSelected: boolean;
     onHold: (id: string) => void;
     onClick: (id: string) => void;
     onQuantityChange: (itemId: string, newAmount: number) => void;
@@ -25,6 +25,7 @@ export default function IngredientItem({
 }: IngredientItemProps) {
     const holdTimerRef = useRef<number>(0);
     const wasHoldRef = useRef(false);
+    const [imageError, setImageError] = useState(false);
 
     const getDaysUntilExpiry = () => {
         const today = new Date();
@@ -62,7 +63,7 @@ export default function IngredientItem({
         if (mode === "cooking" && !wasHoldRef.current) {
             onClick(ingredient.id);
         }
-         wasHoldRef.current = false;
+        wasHoldRef.current = false;
     };
 
     const handleIncrease = (e: React.MouseEvent) => {
@@ -90,13 +91,28 @@ export default function IngredientItem({
         return `${ingredient.quantity} • ${ingredient.size} ${label}`;
     };
 
+    const image = (
+        <div className="w-12 h-12 shrink-0 rounded-xl overflow-hidden bg-gray-100 border border-gray-200 flex items-center justify-center">
+            {ingredient.imageUrl && !imageError ? (
+                <img
+                    src={ingredient.imageUrl}
+                    alt={ingredient.name}
+                    className="w-full h-full object-contain p-1"
+                    onError={() => setImageError(true)}
+                />
+            ) : (
+                <i className="fa-solid fa-box text-gray-400 text-lg"></i>
+            )}
+        </div>
+    );
+
     return (
         <Card
             title={ingredient.name}
             subtitle={getSubtitle()}
             isSelected={isSelected} 
             className={`select-none relative ${days < 0 ? 'bg-cancel-danger-hover animate-pulse' : ''}`}
-            
+            image={image}
             action={
                 <div className="flex flex-col items-end justify-between h-full min-h-50px gap-2">
                     <Badge 
@@ -110,14 +126,18 @@ export default function IngredientItem({
                             disabled={ingredient.quantity <= 1}
                             className={`w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors ${ingredient.quantity <= 1 ? 'opacity-50 cursor-not-allowed' : ''}`}
                         >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" /></svg>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 12H4" />
+                            </svg>
                         </button>
 
                         <button 
                             onClick={handleIncrease}
                             className="w-7 h-7 flex items-center justify-center rounded-full bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                         >
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                            </svg>
                         </button>
 
                         <div className="w-px h-4 bg-gray-300 mx-1"></div>
@@ -127,14 +147,13 @@ export default function IngredientItem({
                             className="w-7 h-7 flex items-center justify-center rounded-full bg-red-50 text-red-500 hover:bg-red-100 transition-colors"
                             title="Delete Item"
                         >
-                           <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                             </svg>
                         </button>
                     </div>
                 </div>
             }
-
             onClick={handleClick}
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}

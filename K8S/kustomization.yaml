@@ -22,3 +22,4 @@ resources:
 
   - app-secrets.secret.yaml
   - edamam-secrets.secret.yaml
+  - azure-secrets.secret.yaml

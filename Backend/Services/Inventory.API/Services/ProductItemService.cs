@@ -10,7 +10,7 @@ using Inventory.API.Services.Interfaces;
 namespace Inventory.API.Services
 {
     public class ProductItemService(IProductItemRepository productItemRepository, IKitchenRepository kitchenRepository, 
-        IProductRepository productRepository, IPolishToEnglishTranslator translator, ICurrentUser currentUser, IMapper mapper) : IProductItemService
+        IProductRepository productRepository, ITranslatorService translatorService, ICurrentUser currentUser, IMapper mapper) : IProductItemService
     {
         public async Task<ProductItemResponseDTO> GetItemFromKitchen(Guid? kitchenId, Guid? itemId)
         {
@@ -70,7 +70,7 @@ namespace Inventory.API.Services
             if (product.MainCategory != null && string.IsNullOrEmpty(product.MainCategory.EnglishName))
             {
                 var polishName = product.MainCategory.PolishName;
-                var englishName = await translator.Translate(polishName);
+                var englishName = await translatorService.Translate(polishName, "en");
 
                 product.MainCategory.EnglishName = englishName;
             }

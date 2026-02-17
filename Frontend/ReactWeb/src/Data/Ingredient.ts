@@ -11,4 +11,5 @@ export interface Ingredient {
     expirationDate: Date;
     isExpired: boolean;
     mainCategory: string;
+    imageUrl?: string;
 }

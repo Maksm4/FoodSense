@@ -5,7 +5,7 @@ export interface ProductResponse {
     name: string;
     brand: string;
     barCode: string;
-    visualRepresentation: string;
+    imageUrl: string;
 }
 
 export const productService = {

@@ -2,6 +2,7 @@ using System.Text;
 using System.Text.Json.Serialization;
 using Common.Middlewares;
 using Common.Services;
+using Inventory.API.Config;
 using Inventory.API.Data.Context;
 using Inventory.API.Data.Context.Seeder;
 using Inventory.API.Data.Interfaces;
@@ -25,6 +26,8 @@ builder.Services.AddDbContext<InventoryDbContext>(
                 errorNumbersToAdd: null)
             )
         );
+//config
+builder.Services.Configure<AzureSettings>(builder.Configuration.GetSection("Azure"));
 
 //services
 builder.Services.AddScoped<IKitchenService, KitchenService>();
@@ -32,7 +35,11 @@ builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IProductItemService, ProductItemService>();
 builder.Services.AddScoped<IKitchenInviteService, KitchenInviteService>();
 builder.Services.AddScoped<CsvProductSeeder>();
-builder.Services.AddSingleton<IPolishToEnglishTranslator, AzurePolishToEnglishTranslator>();
+builder.Services.AddHttpClient<ITranslatorService, AzureTranslatorService>(client =>
+{
+    client.BaseAddress = new Uri("https://api.cognitive.microsofttranslator.com");
+    client.Timeout = TimeSpan.FromSeconds(5);
+});
 
 //repositories
 builder.Services.AddScoped<IKitchenRepository, KitchenRepository>();
@@ -89,7 +96,6 @@ using (var scope = app.Services.CreateScope())
         var context = services.GetRequiredService<InventoryDbContext>();
         var seeder = services.GetRequiredService<CsvProductSeeder>();
         
-        context.Database.EnsureDeleted(); //temp
         context.Database.Migrate();
         var csvPath = Path.Combine(AppContext.BaseDirectory, "Data", "Seeding", "off_products.csv");
         

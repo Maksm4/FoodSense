@@ -33,3 +33,14 @@ spec:
                 secretKeyRef:
                   name: app-secrets
                   key: jwt-key
+            - name: Azure__TranslatorKey 
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: TRANSLATOR_KEY
+
+            - name: Azure__TranslatorRegion
+              valueFrom:
+                secretKeyRef:
+                  name: azure-secrets
+                  key: TRANSLATOR_REGION
