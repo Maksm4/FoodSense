@@ -27,12 +27,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: recipe-conn
+                  key: RECIPE-CONNECTION-STRING
             - name: JwtSettings__SecretKey
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: jwt-key
+                  key: JWT-KEY
 
             - name: Edamam__AppId
               valueFrom:

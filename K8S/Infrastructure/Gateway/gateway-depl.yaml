@@ -23,7 +23,7 @@ spec:
           valueFrom:
             secretKeyRef:
               name: app-secrets
-              key: jwt-key
+              key: JWT-KEY
               
         - name: ReverseProxy__Clusters__AuthAPICluster__Destinations__AuthAPIDestination__Address
           value: "http://auth-svc:80"
