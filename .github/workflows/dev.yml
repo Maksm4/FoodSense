@@ -1,0 +1,76 @@
+name: Monorepo development CI for each microservice
+on: 
+  push:
+    branches: [ "main" ]
+    
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      inventory: ${{ steps.filter.outputs.inventory }}
+      auth: ${{ steps.filter.outputs.auth }}
+      gateway: ${{ steps.filter.outputs.gateway }}
+      recipe: ${{ steps.filter.outputs.recipe }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: | 
+            inventory:
+              - 'Services/Inventory.API/**'
+            auth:
+              - 'Services/Auth.API/**'
+            gateway:
+              - 'Gateway/ApiGateway/**'
+            recipe:
+              - 'Services/Recipe.API/**'
+              
+  inventory-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.inventory == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup .NET
+        uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '9.0.x' }
+      - name: build #can add test later
+        run: |
+          dotnet build Services/Inventory.API/Inventory.API.csproj
+  auth-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.auth == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup .NET
+        uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '9.0.x' }
+      - name: build #can add test later
+        run: |
+          dotnet build Services/Auth.API/Auth.API.csproj
+  recipe-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.recipe == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup .NET
+        uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '9.0.x' }
+      - name: build #can add test later
+        run: |
+          dotnet build Services/Recipe.API/Recipe.API.csproj
+  gateway-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.gateway == 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: setup .NET
+        uses: actions/setup-dotnet@v4
+        with: { dotnet-version: '9.0.x' }
+      - name: build #can add test later
+        run: |
+          dotnet build Gateway/ApiGateway/ApiGateway.csproj
