@@ -27,10 +27,10 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: AUTH-CONNECTION-STRING
-                  
+                  key: AUTH_CONNECTION
+
             - name: JwtSettings__SecretKey
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: JWT-KEY
+                  key: JWT_KEY

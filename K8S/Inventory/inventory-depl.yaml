@@ -27,12 +27,12 @@ spec:
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: inventory-conn
+                  key: INVENTORY_CONNECTION
             - name: JwtSettings__SecretKey
               valueFrom:
                 secretKeyRef:
                   name: app-secrets
-                  key: jwt-key
+                  key: JWT_KEY
             - name: Azure__TranslatorKey 
               valueFrom:
                 secretKeyRef:

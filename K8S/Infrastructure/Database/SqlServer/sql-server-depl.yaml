@@ -27,7 +27,7 @@ spec:
           valueFrom:  
               secretKeyRef:
                 name: app-secrets
-                key: SA-PASSWORD
+                key: SA_PASSWORD
         ports:
         - containerPort: 1433
         
