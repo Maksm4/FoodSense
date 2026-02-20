@@ -1,0 +1,40 @@
+name: .NET Build
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        description: "Short service name, used only for log labels"
+        required: true
+        type: string
+      project_path:
+        description: "Path to .csproj file from repo root"
+        required: true
+        type: string
+      dotnet_version:
+        description: ".NET SDK version"
+        required: false
+        type: string
+        default: "9.0.x"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup .NET ${{ inputs.dotnet_version }}
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: ${{ inputs.dotnet_version }}
+
+      - name: Cache NuGet packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.nuget/packages
+          key: nuget-${{ runner.os }}-${{ hashFiles('**/*.csproj') }}
+          restore-keys: |
+            nuget-${{ runner.os }}-
+
+      - name: Build ${{ inputs.service }}
+        run: dotnet build ${{ inputs.project_path }} --configuration Release
