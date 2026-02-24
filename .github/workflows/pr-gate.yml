@@ -1,0 +1,64 @@
+name: PR Quality Check Gate
+
+on:
+  pull_request:
+    branches: [ "production" ]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      inventory: ${{ steps.filter.outputs.inventory }}
+      auth:      ${{ steps.filter.outputs.auth }}
+      gateway:   ${{ steps.filter.outputs.gateway }}
+      recipe:    ${{ steps.filter.outputs.recipe }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            inventory:
+              - 'Services/Inventory.API/**'
+            auth:
+              - 'Services/Auth.API/**'
+            gateway:
+              - 'Gateway/ApiGateway/**'
+            recipe:
+              - 'Services/Recipe.API/**'
+
+  inventory-check:
+    needs: changes
+    if: ${{ needs.changes.outputs.inventory == 'true' }}
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service:    inventory
+      dockerfile: Services/Inventory.API/Dockerfile
+      push:       false
+
+  auth-check:
+    needs: changes
+    if: ${{ needs.changes.outputs.auth == 'true' }}
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service:    auth
+      dockerfile: Services/Auth.API/Dockerfile
+      push:       false
+
+  gateway-check:
+    needs: changes
+    if: ${{ needs.changes.outputs.gateway == 'true' }}
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service:    gateway
+      dockerfile: Gateway/ApiGateway/Dockerfile
+      push:       false
+
+  recipe-check:
+    needs: changes
+    if: ${{ needs.changes.outputs.recipe == 'true' }}
+    uses: ./.github/workflows/build-service.yml
+    with:
+      service:    recipe
+      dockerfile: Services/Recipe.API/Dockerfile
+      push:       false
