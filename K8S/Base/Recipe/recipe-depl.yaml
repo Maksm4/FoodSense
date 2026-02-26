@@ -18,8 +18,8 @@ spec:
           command: ['sh', '-c', "until nc -z sql-server-svc 1433; do echo waiting for sql; sleep 2; done"]
       containers:
         - name: recipe-api
-          image: maksm4/recipeapi:latest
-          imagePullPolicy: Never
+          image: ghcr.io/maksm4/foodsense/recipe:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 8080
           env:

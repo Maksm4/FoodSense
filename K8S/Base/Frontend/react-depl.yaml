@@ -16,7 +16,7 @@ spec:
         - name: ghcr-secret
       containers:
         - name: frontend
-          image: ghcr.io/Maksm4/FoodSense/react-frontend:latest
+          image: ghcr.io/maksm4/foodsense/frontend:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
