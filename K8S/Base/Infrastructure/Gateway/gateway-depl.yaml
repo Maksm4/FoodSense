@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
       - name: gateway-api
-        image: maksm4/gatewayapi:latest
-        imagePullPolicy: Never
+        image: ghcr.io/maksm4/foodsense/gateway:latest
+        imagePullPolicy: Always
         ports:
         - containerPort: 8080
         env:
