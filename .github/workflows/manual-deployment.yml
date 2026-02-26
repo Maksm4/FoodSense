@@ -2,7 +2,7 @@ name: Production Deployment manual
 
 on:
   workflow_dispatch:
-    
+
 permissions:
   contents: read
   packages: write
@@ -94,7 +94,7 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Apply Kustomize
-        run: kubectl apply -k K8s/overlays/production
+        run: kubectl apply -k K8S/Overlays/Prod
 
       - name: Restart all deployments
         run: |
