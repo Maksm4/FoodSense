@@ -2,6 +2,10 @@ name: Production Deployment manual
 
 on:
   workflow_dispatch:
+    
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   inventory-build:

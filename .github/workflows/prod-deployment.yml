@@ -3,6 +3,10 @@ name: Production Deployment
 on:
   push:
     branches: [ "production" ]
+    
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   changes:
