@@ -42,7 +42,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
           
       - name: Convert repository name to lowercase
-        run: echo "REPO_LC=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
+        run: echo "REPO_LOWER=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Build ${{ inputs.service }}
         uses: docker/build-push-action@v4
@@ -53,7 +53,7 @@ jobs:
           build-args: ${{ inputs.build_args }}
           tags: >-
             ${{ inputs.push
-              && format('{0}/{1}/{2}:latest', env.REGISTRY, env.REPO_LC, inputs.service)
+              && format('{0}/{1}/{2}:latest', env.REGISTRY, env.REPO_LOWER, inputs.service)
               || format('{0}:test', inputs.service) }}
           cache-from: type=gha,scope=${{ inputs.service }}
           cache-to:   type=gha,mode=max,scope=${{ inputs.service }}
