@@ -1,0 +1,92 @@
+name: Production Deployment manual
+
+on:
+  workflow_dispatch:
+
+jobs:
+  inventory-build:
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    inventory
+      dockerfile: Services/Inventory.API/Dockerfile
+      push:       true
+    secrets: inherit
+
+  auth-build:
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    auth
+      dockerfile: Services/Auth.API/Dockerfile
+      push:       true
+    secrets: inherit
+
+  gateway-build:
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    gateway
+      dockerfile: Gateway/ApiGateway/Dockerfile
+      push:       true
+    secrets: inherit
+
+  recipe-build:
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    recipe
+      dockerfile: Services/Recipe.API/Dockerfile
+      push:       true
+    secrets: inherit
+
+  frontend-build:
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    frontend
+      dockerfile: Frontend/ReactWeb/Dockerfile
+      push:       true
+      build_args: VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+    secrets: inherit
+
+  deploy:
+    needs: [ inventory-build, auth-build, gateway-build, recipe-build, frontend-build ]
+    runs-on: self-hosted
+    environment: Production
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update GHCR pull secret
+        run: |
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GHCR_PAT }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Update app-secrets
+        run: |
+          kubectl create secret generic app-secrets \
+            --from-literal=AUTH_CONNECTION="${{ secrets.AUTH_CONNECTION }}" \
+            --from-literal=INVENTORY_CONNECTION="${{ secrets.INVENTORY_CONNECTION }}" \
+            --from-literal=RECIPE_CONNECTION="${{ secrets.RECIPE_CONNECTION }}" \
+            --from-literal=JWT_KEY="${{ secrets.JWT_KEY }}" \
+            --from-literal=SA_PASSWORD="${{ secrets.SA_PASSWORD }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Update azure-secrets
+        run: |
+          kubectl create secret generic azure-secrets \
+            --from-literal=TRANSLATOR_KEY="${{ secrets.TRANSLATOR_KEY }}" \
+            --from-literal=TRANSLATOR_REGION="${{ vars.TRANSLATOR_REGION }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Update edamam-secrets
+        run: |
+          kubectl create secret generic edamam-secrets \
+            --from-literal=EDAMAM_APPID="${{ secrets.EDAMAM_APPID }}" \
+            --from-literal=EDAMAM_APPKEY="${{ secrets.EDAMAM_APPKEY }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply Kustomize
+        run: kubectl apply -k K8s/overlays/production
+
+      - name: Restart all deployments
+        run: |
+            kubectl rollout restart deployment inventory-api-depl auth-api-depl gateway-depl recipe-api-depl frontend-depl
