@@ -76,7 +76,7 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    frontend
-      dockerfile: Frontend/Dockerfile
+      dockerfile: Frontend/ReactWeb/Dockerfile
       push:       true
       build_args: VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
     secrets: inherit
