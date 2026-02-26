@@ -4,7 +4,7 @@ metadata:
   name: ingress-entry
 spec:
   rules:
-  - host: 192.168.0.167
+  - host: "192.168.0.167"
     http:
       paths:
       - path: /api/.*
