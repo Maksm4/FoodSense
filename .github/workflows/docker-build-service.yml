@@ -20,6 +20,11 @@ on:
         description: "Arguments to pass to the Docker build"
         required: false
         type: string
+      build_context:
+        description: "Folder to run the Docker build from"
+        required: false
+        type: string
+        default: "."
 
 env:
   REGISTRY: ghcr.io
@@ -47,7 +52,7 @@ jobs:
       - name: Build ${{ inputs.service }}
         uses: docker/build-push-action@v4
         with:
-          context: .
+          context: ${{ inputs.build_context }}
           file: ${{ inputs.dockerfile }}
           push: ${{ inputs.push }}
           build-args: ${{ inputs.build_args }}
