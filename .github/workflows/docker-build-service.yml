@@ -16,6 +16,10 @@ on:
         required: false
         type: boolean
         default: false
+      build_args:
+        description: "Arguments to pass to the Docker build"
+        required: false
+        type: string
 
 env:
   REGISTRY: ghcr.io
@@ -43,6 +47,7 @@ jobs:
           context: .
           file: ${{ inputs.dockerfile }}
           push: ${{ inputs.push }}
+          build-args: ${{ inputs.build_args }}
           tags: >-
             ${{ inputs.push
               && format('{0}/{1}/{2}-api:latest', env.REGISTRY, github.repository, inputs.service)

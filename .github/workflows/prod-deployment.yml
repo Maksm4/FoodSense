@@ -12,6 +12,7 @@ jobs:
       auth:      ${{ steps.filter.outputs.auth }}
       gateway:   ${{ steps.filter.outputs.gateway }}
       recipe:    ${{ steps.filter.outputs.recipe }}
+      frontend:  ${{ steps.filter.outputs.frontend }}
     steps:
       - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
@@ -26,11 +27,13 @@ jobs:
               - 'Gateway/ApiGateway/**'
             recipe:
               - 'Services/Recipe.API/**'
-#run in parallel after changes finishes
+            frontend:
+              - 'Frontend/**'
+
   inventory-build:
     needs: changes
     if: ${{ needs.changes.outputs.inventory == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    inventory
       dockerfile: Services/Inventory.API/Dockerfile
@@ -40,7 +43,7 @@ jobs:
   auth-build:
     needs: changes
     if: ${{ needs.changes.outputs.auth == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    auth
       dockerfile: Services/Auth.API/Dockerfile
@@ -50,7 +53,7 @@ jobs:
   gateway-build:
     needs: changes
     if: ${{ needs.changes.outputs.gateway == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    gateway
       dockerfile: Gateway/ApiGateway/Dockerfile
@@ -60,21 +63,33 @@ jobs:
   recipe-build:
     needs: changes
     if: ${{ needs.changes.outputs.recipe == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    recipe
       dockerfile: Services/Recipe.API/Dockerfile
       push:       true
     secrets: inherit
 
+  frontend-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    frontend
+      dockerfile: Frontend/Dockerfile
+      push:       true
+      build_args: VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+    secrets: inherit
+
   deploy:
-    needs: [ inventory-build, auth-build, gateway-build, recipe-build ]
+    needs: [ inventory-build, auth-build, gateway-build, recipe-build, frontend-build ]
     if: |
       always() && (
         needs.inventory-build.result == 'success' ||
         needs.auth-build.result      == 'success' ||
         needs.gateway-build.result   == 'success' ||
-        needs.recipe-build.result    == 'success'
+        needs.recipe-build.result    == 'success' ||
+        needs.frontend-build.result  == 'success'
       )
     runs-on: self-hosted
     environment: Production
@@ -88,7 +103,7 @@ jobs:
             --docker-username=${{ github.actor }} \
             --docker-password=${{ secrets.GHCR_PAT }} \
             --dry-run=client -o yaml | kubectl apply -f -
-#app secrets
+
       - name: Update app-secrets
         run: |
           kubectl create secret generic app-secrets \
@@ -98,14 +113,14 @@ jobs:
             --from-literal=JWT_KEY="${{ secrets.JWT_KEY }}" \
             --from-literal=SA_PASSWORD="${{ secrets.SA_PASSWORD }}" \
             --dry-run=client -o yaml | kubectl apply -f -
-#azure secrets
+
       - name: Update azure-secrets
         run: |
           kubectl create secret generic azure-secrets \
             --from-literal=TRANSLATOR_KEY="${{ secrets.TRANSLATOR_KEY }}" \
             --from-literal=TRANSLATOR_REGION="${{ vars.TRANSLATOR_REGION }}" \
             --dry-run=client -o yaml | kubectl apply -f -
-#edamam recipes secrets
+
       - name: Update edamam-secrets
         run: |
           kubectl create secret generic edamam-secrets \
@@ -114,7 +129,7 @@ jobs:
             --dry-run=client -o yaml | kubectl apply -f -
 
       - name: Apply Kustomize
-        run: kubectl apply -k K8s/
+        run: kubectl apply -k K8s/overlays/production
 
       - name: Restart changed deployments
         run: |
@@ -137,4 +152,7 @@ jobs:
           fi
           if [ "${{ needs.recipe-build.result }}" == "success" ]; then
             restart_and_wait recipe-api-depl
+          fi
+          if [ "${{ needs.frontend-build.result }}" == "success" ]; then
+            restart_and_wait frontend-depl
           fi

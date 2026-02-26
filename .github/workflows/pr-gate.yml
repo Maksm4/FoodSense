@@ -12,6 +12,7 @@ jobs:
       auth:      ${{ steps.filter.outputs.auth }}
       gateway:   ${{ steps.filter.outputs.gateway }}
       recipe:    ${{ steps.filter.outputs.recipe }}
+      frontend:  ${{ steps.filter.outputs.frontend }}
     steps:
       - uses: actions/checkout@v3
       - uses: dorny/paths-filter@v2
@@ -26,11 +27,13 @@ jobs:
               - 'Gateway/ApiGateway/**'
             recipe:
               - 'Services/Recipe.API/**'
+            frontend:
+              - 'Frontend/**'
 
   inventory-check:
     needs: changes
     if: ${{ needs.changes.outputs.inventory == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    inventory
       dockerfile: Services/Inventory.API/Dockerfile
@@ -39,7 +42,7 @@ jobs:
   auth-check:
     needs: changes
     if: ${{ needs.changes.outputs.auth == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    auth
       dockerfile: Services/Auth.API/Dockerfile
@@ -48,7 +51,7 @@ jobs:
   gateway-check:
     needs: changes
     if: ${{ needs.changes.outputs.gateway == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    gateway
       dockerfile: Gateway/ApiGateway/Dockerfile
@@ -57,8 +60,18 @@ jobs:
   recipe-check:
     needs: changes
     if: ${{ needs.changes.outputs.recipe == 'true' }}
-    uses: ./.github/workflows/build-service.yml
+    uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    recipe
       dockerfile: Services/Recipe.API/Dockerfile
       push:       false
+
+  frontend-check:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    frontend
+      dockerfile: Frontend/Dockerfile
+      push:       false
+      build_args: VITE_API_BASE_URL=http://localhost/api
