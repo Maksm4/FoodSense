@@ -1,0 +1,158 @@
+name: Production Deployment
+
+on:
+  push:
+    branches: [ "production" ]
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      inventory: ${{ steps.filter.outputs.inventory }}
+      auth:      ${{ steps.filter.outputs.auth }}
+      gateway:   ${{ steps.filter.outputs.gateway }}
+      recipe:    ${{ steps.filter.outputs.recipe }}
+      frontend:  ${{ steps.filter.outputs.frontend }}
+    steps:
+      - uses: actions/checkout@v3
+      - uses: dorny/paths-filter@v2
+        id: filter
+        with:
+          filters: |
+            inventory:
+              - 'Services/Inventory.API/**'
+            auth:
+              - 'Services/Auth.API/**'
+            gateway:
+              - 'Gateway/ApiGateway/**'
+            recipe:
+              - 'Services/Recipe.API/**'
+            frontend:
+              - 'Frontend/**'
+
+  inventory-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.inventory == 'true' }}
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    inventory
+      dockerfile: Services/Inventory.API/Dockerfile
+      push:       true
+    secrets: inherit
+
+  auth-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.auth == 'true' }}
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    auth
+      dockerfile: Services/Auth.API/Dockerfile
+      push:       true
+    secrets: inherit
+
+  gateway-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.gateway == 'true' }}
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    gateway
+      dockerfile: Gateway/ApiGateway/Dockerfile
+      push:       true
+    secrets: inherit
+
+  recipe-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.recipe == 'true' }}
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    recipe
+      dockerfile: Services/Recipe.API/Dockerfile
+      push:       true
+    secrets: inherit
+
+  frontend-build:
+    needs: changes
+    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    uses: ./.github/workflows/docker-build-service.yml
+    with:
+      service:    frontend
+      dockerfile: Frontend/Dockerfile
+      push:       true
+      build_args: VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
+    secrets: inherit
+
+  deploy:
+    needs: [ inventory-build, auth-build, gateway-build, recipe-build, frontend-build ]
+    if: |
+      always() && (
+        needs.inventory-build.result == 'success' ||
+        needs.auth-build.result      == 'success' ||
+        needs.gateway-build.result   == 'success' ||
+        needs.recipe-build.result    == 'success' ||
+        needs.frontend-build.result  == 'success'
+      )
+    runs-on: self-hosted
+    environment: Production
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Update GHCR pull secret
+        run: |
+          kubectl create secret docker-registry ghcr-secret \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GHCR_PAT }} \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Update app-secrets
+        run: |
+          kubectl create secret generic app-secrets \
+            --from-literal=AUTH_CONNECTION="${{ secrets.AUTH_CONNECTION }}" \
+            --from-literal=INVENTORY_CONNECTION="${{ secrets.INVENTORY_CONNECTION }}" \
+            --from-literal=RECIPE_CONNECTION="${{ secrets.RECIPE_CONNECTION }}" \
+            --from-literal=JWT_KEY="${{ secrets.JWT_KEY }}" \
+            --from-literal=SA_PASSWORD="${{ secrets.SA_PASSWORD }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Update azure-secrets
+        run: |
+          kubectl create secret generic azure-secrets \
+            --from-literal=TRANSLATOR_KEY="${{ secrets.TRANSLATOR_KEY }}" \
+            --from-literal=TRANSLATOR_REGION="${{ vars.TRANSLATOR_REGION }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Update edamam-secrets
+        run: |
+          kubectl create secret generic edamam-secrets \
+            --from-literal=EDAMAM_APPID="${{ secrets.EDAMAM_APPID }}" \
+            --from-literal=EDAMAM_APPKEY="${{ secrets.EDAMAM_APPKEY }}" \
+            --dry-run=client -o yaml | kubectl apply -f -
+
+      - name: Apply Kustomize
+        run: kubectl apply -k K8s/overlays/production
+
+      - name: Restart changed deployments
+        run: |
+          restart_and_wait() {
+            local deployment=$1
+            echo "Restarting $deployment..."
+            kubectl rollout restart deployment "$deployment"
+            kubectl rollout status deployment "$deployment" --timeout=120s
+            echo "$deployment is live."
+          }
+
+          if [ "${{ needs.inventory-build.result }}" == "success" ]; then
+            restart_and_wait inventory-api-depl
+          fi
+          if [ "${{ needs.auth-build.result }}" == "success" ]; then
+            restart_and_wait auth-api-depl
+          fi
+          if [ "${{ needs.gateway-build.result }}" == "success" ]; then
+            restart_and_wait gateway-depl
+          fi
+          if [ "${{ needs.recipe-build.result }}" == "success" ]; then
+            restart_and_wait recipe-api-depl
+          fi
+          if [ "${{ needs.frontend-build.result }}" == "success" ]; then
+            restart_and_wait frontend-depl
+          fi

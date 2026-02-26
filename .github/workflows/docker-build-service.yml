@@ -1,0 +1,57 @@
+name: Docker Build Service
+
+on:
+  workflow_call:
+    inputs:
+      service:
+        description: "Short service name used for cache and image tags"
+        required: true
+        type: string
+      dockerfile:
+        description: "Path to the Dockerfile from repo root"
+        required: true
+        type: string
+      push:
+        description: "Push image to GHCR after build"
+        required: false
+        type: boolean
+        default: false
+      build_args:
+        description: "Arguments to pass to the Docker build"
+        required: false
+        type: string
+
+env:
+  REGISTRY: ghcr.io
+
+jobs:
+  build:
+    runs-on: ${{ inputs.push && 'self-hosted' || 'ubuntu-latest' }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Build
+        uses: docker/setup-buildx-action@v2
+
+      - name: Log in to GHCR
+        if: ${{ inputs.push }}
+        uses: docker/login-action@v2
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build ${{ inputs.service }}
+        uses: docker/build-push-action@v4
+        with:
+          context: .
+          file: ${{ inputs.dockerfile }}
+          push: ${{ inputs.push }}
+          build-args: ${{ inputs.build_args }}
+          tags: >-
+            ${{ inputs.push
+              && format('{0}/{1}/{2}-api:latest', env.REGISTRY, github.repository, inputs.service)
+              || format('{0}:test', inputs.service) }}
+
+          cache-from: type=gha,scope=${{ inputs.service }}
+          cache-to:   type=gha,mode=max,scope=${{ inputs.service }}

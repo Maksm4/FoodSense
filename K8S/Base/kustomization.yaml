@@ -19,3 +19,6 @@ resources:
   - Recipe/recipe-svc.yaml
 
   - Infrastructure/Ingress/ingress-entry.yaml
+
+  - Frontend/react-depl.yaml
+  - Frontend/react-svc.yaml
