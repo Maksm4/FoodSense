@@ -36,7 +36,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    inventory
-      dockerfile: Services/Inventory.API/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Services/Inventory.API/Dockerfile
       push:       false
 
   auth-check:
@@ -45,7 +46,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    auth
-      dockerfile: Services/Auth.API/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Services/Auth.API/Dockerfile
       push:       false
 
   gateway-check:
@@ -54,7 +56,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    gateway
-      dockerfile: Gateway/ApiGateway/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Gateway/ApiGateway/Dockerfile
       push:       false
 
   recipe-check:
@@ -63,7 +66,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    recipe
-      dockerfile: Services/Recipe.API/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Services/Recipe.API/Dockerfile
       push:       false
 
   frontend-check:
@@ -72,6 +76,7 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    frontend
+      build_context: Frontend/ReactWeb
       dockerfile: Frontend/ReactWeb/Dockerfile
       push:       false
       build_args: VITE_API_BASE_URL=http://localhost/api

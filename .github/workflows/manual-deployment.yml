@@ -8,7 +8,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    inventory
-      dockerfile: Services/Inventory.API/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Services/Inventory.API/Dockerfile
       push:       true
     secrets: inherit
 
@@ -16,7 +17,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    auth
-      dockerfile: Services/Auth.API/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Services/Auth.API/Dockerfile
       push:       true
     secrets: inherit
 
@@ -24,7 +26,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    gateway
-      dockerfile: Gateway/ApiGateway/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Gateway/ApiGateway/Dockerfile
       push:       true
     secrets: inherit
 
@@ -32,7 +35,8 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    recipe
-      dockerfile: Services/Recipe.API/Dockerfile
+      build_context: Backend
+      dockerfile: Backend/Services/Recipe.API/Dockerfile
       push:       true
     secrets: inherit
 
@@ -40,6 +44,7 @@ jobs:
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    frontend
+      build_context: Frontend/ReactWeb
       dockerfile: Frontend/ReactWeb/Dockerfile
       push:       true
       build_args: VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
