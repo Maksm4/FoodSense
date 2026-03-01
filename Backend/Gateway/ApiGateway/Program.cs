@@ -47,7 +47,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("http://foodsense.local", "http://localhost:5173", "http://192.168.0.241:5173")
+        policy.WithOrigins("http://foodsense.interal", "http://localhost:5173", "http://192.168.0.167" /* runner host as router has no DNS forwarding */)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
