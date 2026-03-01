@@ -98,4 +98,4 @@ jobs:
 
       - name: Restart all deployments
         run: |
-            kubectl rollout restart deployment inventory-api-depl auth-api-depl gateway-depl recipe-api-depl frontend-depl
+            kubectl rollout restart deployment inventory-api-depl auth-api-depl gateway-depl recipe-api-depl react-frontend-depl
