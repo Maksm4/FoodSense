@@ -20,13 +20,16 @@ jobs:
         with:
           filters: |
             inventory:
-              - 'Services/Inventory.API/**'
+              - 'Backend/Services/Inventory.API/**'
+              - 'Backend/Common/**'
             auth:
-              - 'Services/Auth.API/**'
+              - 'Backend/Services/Auth.API/**'
+              - 'Backend/Common/**'
             gateway:
-              - 'Gateway/ApiGateway/**'
+              - 'Backend/Gateway/ApiGateway/**'
             recipe:
-              - 'Services/Recipe.API/**'
+              - 'Backend/Services/Recipe.API/**'
+              - 'Backend/Common/**'
             frontend:
               - 'Frontend/**'
 
