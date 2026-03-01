@@ -1,4 +1,4 @@
-name: Production Deployment manual
+name: Deployment manual
 
 on:
   workflow_dispatch:
@@ -8,54 +8,7 @@ permissions:
   packages: write
 
 jobs:
-  inventory-build:
-    uses: ./.github/workflows/docker-build-service.yml
-    with:
-      service:    inventory
-      build_context: Backend
-      dockerfile: Backend/Services/Inventory.API/Dockerfile
-      push:       true
-    secrets: inherit
-
-  auth-build:
-    uses: ./.github/workflows/docker-build-service.yml
-    with:
-      service:    auth
-      build_context: Backend
-      dockerfile: Backend/Services/Auth.API/Dockerfile
-      push:       true
-    secrets: inherit
-
-  gateway-build:
-    uses: ./.github/workflows/docker-build-service.yml
-    with:
-      service:    gateway
-      build_context: Backend
-      dockerfile: Backend/Gateway/ApiGateway/Dockerfile
-      push:       true
-    secrets: inherit
-
-  recipe-build:
-    uses: ./.github/workflows/docker-build-service.yml
-    with:
-      service:    recipe
-      build_context: Backend
-      dockerfile: Backend/Services/Recipe.API/Dockerfile
-      push:       true
-    secrets: inherit
-
-  frontend-build:
-    uses: ./.github/workflows/docker-build-service.yml
-    with:
-      service:    frontend
-      build_context: Frontend/ReactWeb
-      dockerfile: Frontend/ReactWeb/Dockerfile
-      push:       true
-      build_args: VITE_API_BASE_URL=${{ vars.VITE_API_BASE_URL }}
-    secrets: inherit
-
   deploy:
-    needs: [ inventory-build, auth-build, gateway-build, recipe-build, frontend-build ]
     runs-on: self-hosted
     environment: Production
     steps:

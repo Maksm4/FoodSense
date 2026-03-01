@@ -163,5 +163,5 @@ jobs:
             restart_and_wait recipe-api-depl
           fi
           if [ "${{ needs.frontend-build.result }}" == "success" ]; then
-            restart_and_wait frontend-depl
+            restart_and_wait react-frontend-depl
           fi
