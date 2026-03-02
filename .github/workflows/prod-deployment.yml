@@ -4,6 +4,12 @@ on:
   push:
     branches: [ "production" ]
   workflow_dispatch:
+    inputs:
+      force_deploy:
+        description: 'Force deploy ALL services | Bypass filters'
+        required: true
+        type: boolean
+        default: true
 
 permissions:
   contents: read
@@ -22,7 +28,7 @@ jobs:
       - uses: actions/checkout@v3
         with:
           fetch-depth: 0
-      - uses: dorny/paths-filter@v2
+      - uses: dorny/paths-filter@v3
         id: filter
         with:
           filters: |
@@ -42,7 +48,7 @@ jobs:
 
   inventory-build:
     needs: changes
-    if: ${{ needs.changes.outputs.inventory == 'true' }}
+    if: ${{ needs.changes.outputs.inventory == 'true' || inputs.force_deploy == true }}
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    inventory
@@ -53,7 +59,7 @@ jobs:
 
   auth-build:
     needs: changes
-    if: ${{ needs.changes.outputs.auth == 'true' }}
+    if: ${{ needs.changes.outputs.auth == 'true' || inputs.force_deploy == true }}
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    auth
@@ -64,7 +70,7 @@ jobs:
 
   gateway-build:
     needs: changes
-    if: ${{ needs.changes.outputs.gateway == 'true' }}
+    if: ${{ needs.changes.outputs.gateway == 'true' || inputs.force_deploy == true }}
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    gateway
@@ -75,7 +81,7 @@ jobs:
 
   recipe-build:
     needs: changes
-    if: ${{ needs.changes.outputs.recipe == 'true' }}
+    if: ${{ needs.changes.outputs.recipe == 'true' || inputs.force_deploy == true }}
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    recipe
@@ -86,7 +92,7 @@ jobs:
 
   frontend-build:
     needs: changes
-    if: ${{ needs.changes.outputs.frontend == 'true' }}
+    if: ${{ needs.changes.outputs.frontend == 'true' || inputs.force_deploy == true }}
     uses: ./.github/workflows/docker-build-service.yml
     with:
       service:    frontend
