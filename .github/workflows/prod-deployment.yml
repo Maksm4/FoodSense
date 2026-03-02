@@ -3,6 +3,7 @@ name: Production Deployment
 on:
   push:
     branches: [ "production" ]
+  workflow_dispatch:
 
 permissions:
   contents: read
