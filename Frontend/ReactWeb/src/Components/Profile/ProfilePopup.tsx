@@ -6,8 +6,11 @@ import { useAuth } from "../../context/useAuth";
 export default function ProfilePopup() {
     const [isOpen, setIsOpen] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
-    const { logout } = useAuth();
+    const { logout, authUser } = useAuth();
     const navigate = useNavigate();
+
+    const userName = authUser?.unique_name || authUser?.unique_name || ""; 
+    const userEmail = authUser?.["http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress"];
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
