@@ -3,6 +3,7 @@ using Auth.API.Services;
 using Common.Middlewares;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Prometheus;
 
 namespace Auth.API;
 
@@ -35,6 +36,8 @@ public class Program
         builder.Services.AddExceptionHandler<StatusCodeExceptionHandler>();
         
         var app = builder.Build();
+        app.UseHttpMetrics(); 
+        
         if (app.Environment.IsDevelopment())
         {
             app.MapOpenApi();
@@ -60,6 +63,7 @@ public class Program
                 logger.LogError(ex, "An error occurred while migrating the database");
             }
         }
+        app.MapMetrics();
         app.Run();
     }
 }

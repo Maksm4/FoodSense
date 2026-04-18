@@ -14,6 +14,7 @@ using Inventory.API.Services.Translator;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOpenApi();
@@ -76,6 +77,7 @@ builder.Services.AddAuthentication(options =>
         };
     });
 var app = builder.Build();
+app.UseHttpMetrics(); 
 
 app.UseExceptionHandler(opt => { });
 if (app.Environment.IsDevelopment())
@@ -111,4 +113,5 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.MapMetrics();
 app.Run();

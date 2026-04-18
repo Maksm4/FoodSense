@@ -2,6 +2,7 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.IdentityModel.Tokens;
+using Prometheus;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -56,6 +57,8 @@ builder.Services.AddCors(options =>
 
 var app = builder.Build();
 
+app.UseHttpMetrics(); 
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -66,4 +69,5 @@ app.UseAuthorization();
 
 app.UseRateLimiter();
 app.MapReverseProxy();
+app.MapMetrics();
 app.Run();
