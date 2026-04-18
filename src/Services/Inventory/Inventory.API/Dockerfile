@@ -7,14 +7,14 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Services/Inventory.API/Inventory.API.csproj", "Services/Inventory.API/"]
+COPY ["src/Services/Inventory/Inventory.API/Inventory.API.csproj", "Services/Inventory/Inventory.API/"]
 COPY ["src/Common/Common.csproj", "Common/"]
-RUN dotnet restore "Services/Inventory.API/Inventory.API.csproj"
+RUN dotnet restore "Services/Inventory/Inventory.API/Inventory.API.csproj"
 
-COPY ["src/Services/Inventory.API/", "Services/Inventory.API/"]
+COPY ["src/Services/Inventory/Inventory.API/", "Services/Inventory/Inventory.API/"]
 COPY ["src/Common/", "Common/"]
 
-WORKDIR "/src/Services/Inventory.API"
+WORKDIR "/src/Services/Inventory/Inventory.API"
 RUN dotnet build "./Inventory.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
@@ -26,7 +26,7 @@ WORKDIR /app
 
 # for now copy seeding data to container, later store it in PV
 RUN mkdir -p Data/Seeding
-COPY ["src/Services/Inventory.API/Data/Context/Seeder/off_products.csv", "Data/Seeding/"]
+COPY ["src/Services/Inventory/Inventory.API/Data/Context/Seeder/off_products.csv", "Data/Seeding/"]
 
 COPY --from=publish /app/publish .
 

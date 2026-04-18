@@ -20,7 +20,8 @@ _Rider*/
 # --- Secrets (DO NOT COMMIT!) ---
 appsettings.Development.json
 .env
-*.secret.yaml
+*secret*.yaml
+*secrets*.yaml
 
 # --- VS Code ---
 .vscode/*
@@ -35,3 +36,9 @@ appsettings.Development.json
 Thumbs.db
 ehthumbs.db
 [Dd]esktop.ini
+
+# terraform
+**/.terraform/
+*.tfstate
+*.tfstate.backup
+*.tfvars

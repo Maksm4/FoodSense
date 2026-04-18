@@ -7,15 +7,15 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["src/Services/Recipe/Recipe.API/Recipe.API.csproj", "Services/Recipe.API/"]
+COPY ["src/Services/Recipe/Recipe.API/Recipe.API.csproj", "Services/Recipe/Recipe.API/"]
 COPY ["src/Common/Common.csproj", "Common/"]
 
-RUN dotnet restore "Services/Recipe.API/Recipe.API.csproj"
+RUN dotnet restore "Services/Recipe/Recipe.API/Recipe.API.csproj"
 
-COPY ["src/Services/Recipe/Recipe.API/", "Services/Recipe.API/"]
+COPY ["src/Services/Recipe/Recipe.API/", "Services/Recipe/Recipe.API/"]
 COPY ["src/Common/", "Common/"]
 
-WORKDIR "/src/Services/Recipe.API"
+WORKDIR "/src/Services/Recipe/Recipe.API"
 RUN dotnet build "./Recipe.API.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish

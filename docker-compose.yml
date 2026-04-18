@@ -1,0 +1,102 @@
+networks:
+  foodsense:
+    driver: bridge
+
+volumes:
+  mssql-data:
+
+services:
+  sql-server:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: ${SA_PASSWORD}
+    ports:
+      - "1433:1433"          
+    volumes:
+      - mssql-data:/var/opt/mssql
+    networks:
+      - foodsense
+    healthcheck:
+      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  auth:
+    build:
+      context: .
+      dockerfile: src/Services/Auth/Auth.API/Dockerfile
+    environment:
+      ConnectionStrings__DefaultConnection: ${AUTH_CONNECTION}
+      JwtSettings__SecretKey: ${JWT_KEY}
+    ports:
+      - "5001:8080"
+    networks:
+      - foodsense
+    depends_on:
+      sql-server:
+        condition: service_healthy
+
+  inventory:
+    build:
+      context: .
+      dockerfile: src/Services/Inventory/Inventory.API/Dockerfile
+    environment:
+      ConnectionStrings__DefaultConnection: ${INVENTORY_CONNECTION}
+      JwtSettings__SecretKey: ${JWT_KEY}
+    ports:
+      - "5002:8080"
+    networks:
+      - foodsense
+    depends_on:
+      sql-server:
+        condition: service_healthy
+
+  recipe:
+    build:
+      context: .
+      dockerfile: src/Services/Recipe/Recipe.API/Dockerfile
+    environment:
+      ConnectionStrings__DefaultConnection: ${RECIPE_CONNECTION}
+      JwtSettings__SecretKey: ${JWT_KEY}
+      Edamam__AppId: ${EDAMAM_APPID}
+      Edamam__AppKey: ${EDAMAM_APPKEY}
+    ports:
+      - "5003:8080"
+    networks:
+      - foodsense
+    depends_on:
+      sql-server:
+        condition: service_healthy
+
+  gateway:
+    build:
+      context: .
+      dockerfile: src/Gateway/ApiGateway/Dockerfile 
+    environment:
+      Auth__Url: http://auth:8080
+      Inventory__Url: http://inventory:8080
+      Recipe__Url: http://recipe:8080
+    ports:
+      - "5000:8080" 
+    networks:
+      - foodsense
+    depends_on:
+      - auth
+      - inventory
+      - recipe
+
+  frontend:
+    build:
+      context: src/Frontend/ReactWeb
+      dockerfile: Dockerfile
+    environment:
+      VITE_API_URL: http://localhost:5000   
+    ports:
+      - "3000:80"
+    networks:
+      - foodsense
+    depends_on:
+      - gateway
