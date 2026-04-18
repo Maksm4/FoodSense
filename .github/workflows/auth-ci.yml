@@ -1,0 +1,18 @@
+name: Auth CI 
+
+on:
+  pull_request: 
+    branches: [ "dev" ]
+    paths: [ 'src/Services/Auth/**', 'src/Common/**' ]
+  push: 
+    branches: [ "dev" ]
+    paths: [ 'src/Services/Auth/**', 'src/Common/**' ]
+
+jobs:
+  build-auth:
+    uses: ./.github/workflows/template-ci.yml
+    with:
+      service: 'auth'
+      project_path: 'src/Services/Auth/Auth.sln'
+      dockerfile: 'src/Services/Auth/Auth.API/Dockerfile'
+      push: ${{ github.event_name == 'push' }}

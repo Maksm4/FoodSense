@@ -2,4 +2,28 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 resources:
-  - ../../base
+  - ../../Base
+
+replicas:
+  - name: auth-api-depl
+    count: 1
+  - name: react-frontend-depl
+    count: 1
+  - name: inventory-api-depl
+    count: 1
+  - name: recipe-api-depl
+    count: 1
+  - name: gateway-depl
+    count: 1
+
+images:
+  - name: ghcr.io/maksm4/foodsense/auth
+    newTag: latest
+  - name: ghcr.io/maksm4/foodsense/react-frontend
+    newTag: latest
+  - name: ghcr.io/maksm4/foodsense/inventory
+    newTag: latest
+  - name: ghcr.io/maksm4/foodsense/recipe
+    newTag: latest
+  - name: ghcr.io/maksm4/foodsense/gateway
+    newTag: latest

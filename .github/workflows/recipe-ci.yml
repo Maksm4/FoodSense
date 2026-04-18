@@ -1,0 +1,18 @@
+name: Recipe CI 
+
+on:
+  pull_request: 
+    branches: [ "dev" ]
+    paths: [ 'src/Services/Recipe/**', 'src/Common/**' ]
+  push: 
+    branches: [ "dev" ]
+    paths: [ 'src/Services/Recipe/**', 'src/Common/**' ]
+
+jobs:
+  build-recipe:
+    uses: ./.github/workflows/template-ci.yml
+    with:
+      service: 'recipe'
+      project_path: 'src/Services/Recipe/Recipe.sln'
+      dockerfile: 'src/Services/Recipe/Recipe.API/Dockerfile'
+      push: ${{ github.event_name == 'push' }}

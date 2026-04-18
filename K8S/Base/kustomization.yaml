@@ -22,3 +22,7 @@ resources:
 
   - Frontend/react-depl.yaml
   - Frontend/react-svc.yaml
+
+  - Secrets/app-secrets.secret.yaml
+  - Secrets/azure-secrets.secret.yaml
+  - Secrets/edamam-secrets.secret.yaml
