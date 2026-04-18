@@ -1,7 +1,9 @@
 using Microsoft.AspNetCore.Mvc;
+using Prometheus;
 using Recipe.API.DTOs;
 using Recipe.API.DTOs.Request;
 using Recipe.API.DTOs.Response;
+using Recipe.API.Models;
 using Recipe.API.Services;
 
 namespace Recipe.API.Controllers;
@@ -14,8 +16,12 @@ public class RecipesController(IRecipeService recipeService) : ControllerBase
     [ProducesResponseType(typeof(IEnumerable<RecipeSearchResponseDto>), StatusCodes.Status200OK)]
     public async Task<IActionResult> Search([FromQuery] RecipeRequestDto request)
     {
-        var recipes = await recipeService.GetRecipes(request);
-        return Ok(recipes);
+        MonitoringParams.RecipesSearched.Inc();
+        using (MonitoringParams.ExternalApiDuration.NewTimer())
+        {
+            var recipes = await recipeService.GetRecipes(request);
+            return Ok(recipes);
+        }
     }
     
     [HttpGet("saved")]

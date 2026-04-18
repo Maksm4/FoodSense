@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.API", "Auth.API\Auth.API.csproj", "{A4EE698C-8B6A-48C9-8505-599EA6041150}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "..\..\Common\Common.csproj", "{979D0E2D-AA21-4D7E-8715-8869EC509170}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Auth.API.Tests", "Auth.API.Tests\Auth.API.Tests.csproj", "{52BCFE01-1873-4F69-83B2-BDD600DFCAF5}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A4EE698C-8B6A-48C9-8505-599EA6041150}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A4EE698C-8B6A-48C9-8505-599EA6041150}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A4EE698C-8B6A-48C9-8505-599EA6041150}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A4EE698C-8B6A-48C9-8505-599EA6041150}.Release|Any CPU.Build.0 = Release|Any CPU
+		{979D0E2D-AA21-4D7E-8715-8869EC509170}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{979D0E2D-AA21-4D7E-8715-8869EC509170}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{979D0E2D-AA21-4D7E-8715-8869EC509170}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{979D0E2D-AA21-4D7E-8715-8869EC509170}.Release|Any CPU.Build.0 = Release|Any CPU
+		{52BCFE01-1873-4F69-83B2-BDD600DFCAF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{52BCFE01-1873-4F69-83B2-BDD600DFCAF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{52BCFE01-1873-4F69-83B2-BDD600DFCAF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{52BCFE01-1873-4F69-83B2-BDD600DFCAF5}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal

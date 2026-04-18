@@ -5,6 +5,7 @@ using Common.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Prometheus;
 using Recipe.API.Config;
 using Recipe.API.Data.Context;
 using Recipe.API.Data.Repository;
@@ -69,6 +70,7 @@ builder.Services.AddHttpClient<IRecipeProvider, EdamamRecipeProvider>(client =>
 builder.Services.AddAutoMapper(_ => { }, typeof(Program));
 
 var app = builder.Build();
+app.UseHttpMetrics(); 
 
 app.UseExceptionHandler(opt => { });
 if (app.Environment.IsDevelopment())
@@ -97,4 +99,5 @@ using (var scope = app.Services.CreateScope())
     }
 }
 
+app.MapMetrics();
 app.Run();
