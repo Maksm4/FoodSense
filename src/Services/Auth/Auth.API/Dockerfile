@@ -16,16 +16,12 @@ ARG BUILD_CONFIGURATION=Release
 COPY . .
 WORKDIR "/src/Services/Auth.API"
 RUN --mount=type=cache,target=/root/.nuget/packages \
-    dotnet build "./Auth.API.csproj" \
-    -c $BUILD_CONFIGURATION \
-    --no-restore -o /app/build
+    dotnet build "./Auth.API.csproj" -c $BUILD_CONFIGURATION --no-restore -o /app/build
 
 FROM build AS publish
 ARG BUILD_CONFIGURATION=Release
 RUN dotnet publish "./Auth.API.csproj" \
-    -c $BUILD_CONFIGURATION --no-build \
-    --no-restore -o /app/publish \
-    /p:UseAppHost=false
+    -c $BUILD_CONFIGURATION --no-build --no-restore -o /app/publish /p:UseAppHost=false
 
 FROM base AS final
 COPY --from=publish /app/publish .

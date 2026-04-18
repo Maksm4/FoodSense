@@ -7,10 +7,12 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Gateway/ApiGateway/ApiGateway.csproj", "Gateway/ApiGateway/"]
-RUN dotnet restore "Gateway/ApiGateway/ApiGateway.csproj"
-COPY . .
-WORKDIR "/src/Gateway/ApiGateway"
+COPY ["src/Gateway/ApiGateway/ApiGateway.csproj", "Gateway/"]
+RUN dotnet restore "Gateway/ApiGateway.csproj"
+
+COPY ["src/Gateway/ApiGateway/", "Gateway/"]
+
+WORKDIR "/src/Gateway"
 RUN dotnet build "./ApiGateway.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 FROM build AS publish
