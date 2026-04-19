@@ -3,7 +3,7 @@ name: Terraform CI
 on:
   push:
     branches: [prod, dev]
-    paths: ['Terraform/**']
+    paths: ['Terraform/**', '.github/workflows/terraform-ci.yml']
   pull_request:
     branches: [prod, dev]
     paths: ['Terraform/**', '.github/workflows/terraform-ci.yml']
