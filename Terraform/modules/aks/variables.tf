@@ -35,6 +35,6 @@ variable "ghcr_pat" {
 }
 
 variable "tags" {
-  description = "tags to append to" 
-  type = list(string)
+  description = "tags to append to"
+  type        = list(string)
 }

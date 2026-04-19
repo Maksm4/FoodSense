@@ -8,9 +8,9 @@ locals {
 }
 
 resource "azurerm_resource_group" "main" {
-  name = "${local.prefix}-rg"
+  name     = "${local.prefix}-rg"
   location = var.location
-  tags = local.tags
+  tags     = local.tags
 }
 
 resource "azurerm_virtual_network" "main" {
@@ -56,7 +56,7 @@ resource "azurerm_kubernetes_cluster" "main" {
 }
 
 resource "kubernetes_namespace_v1" "app" {
-     metadata {
+  metadata {
     name = var.project_name
     labels = {
       environment = var.environment
