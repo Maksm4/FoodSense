@@ -21,5 +21,5 @@ resource "helm_release" "argocd" {
 
   wait       = true
   timeout    = 200
-  depends_on = [kubernetes_namespace_1.argocd]
+  depends_on = [kubernetes_namespace_v1.argocd]
 }
