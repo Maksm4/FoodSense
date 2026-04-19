@@ -1,12 +1,23 @@
 
-variable "environment" {
-    description = "environment name. used as tag/suffix for resource names"
-    type = string
+variable "project_name" {
+  description = "Project name used as prefix for all resource names"
+  type        = string
+  default     = "foodsense"
 
-    validation {
-      condition = contains(["dev", "prod"], var.environment )
-      error_message = "environment has to be either dev or prod"
-    }
+  validation {
+    condition     = can(regex("^[a-z0-9-]+$", var.project_name))
+    error_message = "Project name must be lowercase alphanumeric and hyphens only"
+  }
+}
+
+variable "environment" {
+  description = "environment name. used as tag/suffix for resource names"
+  type        = string
+
+  validation {
+    condition     = contains(["dev", "prod"], var.environment)
+    error_message = "environment has to be either dev or prod"
+  }
 
 }
 
@@ -15,7 +26,7 @@ variable "location" {
   type        = string
   default     = "westeurope"
 
-    validation {
+  validation {
     condition     = contains(["westeurope", "polandcentral", "germanywestcentral"], var.location)
     error_message = "Location must be a supported Azure region"
   }
@@ -52,4 +63,16 @@ variable "repo_branch" {
 variable "k8s_manifests_path" {
   description = "Path inside the repository that ArgoCD will sync to the cluster"
   type        = string
+}
+
+variable "ghcr_username" {
+  description = "GitHub username for authenticating to GHCR"
+  type        = string
+  default     = "Maksm4"
+}
+
+variable "repo_url" {
+  description = "GitHub repository url that ArgoCD will watch"
+  type        = string
+  default     = "https://github.com/Maksm4/FoodSense"
 }
