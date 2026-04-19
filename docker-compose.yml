@@ -12,13 +12,13 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: ${SA_PASSWORD}
     ports:
-      - "1433:1433"          
+      - "1433:1433"
     volumes:
       - mssql-data:/var/opt/mssql
     networks:
       - foodsense
     healthcheck:
-      test: ["CMD", "/opt/mssql-tools/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1"]
+      test: ["CMD", "/opt/mssql-tools18/bin/sqlcmd", "-S", "localhost", "-U", "sa", "-P", "${SA_PASSWORD}", "-Q", "SELECT 1", "-No"]
       interval: 10s
       timeout: 5s
       retries: 10
@@ -46,6 +46,8 @@ services:
     environment:
       ConnectionStrings__DefaultConnection: ${INVENTORY_CONNECTION}
       JwtSettings__SecretKey: ${JWT_KEY}
+      Azure__TranslatorKey: ${TRANSLATOR_KEY}
+      Azure__TranslatorRegion: ${TRANSLATOR_REGION}
     ports:
       - "5002:8080"
     networks:
@@ -74,13 +76,14 @@ services:
   gateway:
     build:
       context: .
-      dockerfile: src/Gateway/ApiGateway/Dockerfile 
+      dockerfile: src/Gateway/ApiGateway/Dockerfile
     environment:
-      Auth__Url: http://auth:8080
-      Inventory__Url: http://inventory:8080
-      Recipe__Url: http://recipe:8080
+      JwtSettings__SecretKey: ${JWT_KEY}
+      ReverseProxy__Clusters__AuthAPICluster__Destinations__AuthAPIDestination__Address: http://auth:8080
+      ReverseProxy__Clusters__InventoryAPICluster__Destinations__InventoryAPIDestination__Address: http://inventory:8080
+      ReverseProxy__Clusters__RecipesAPICluster__Destinations__RecipesAPIDestination__Address: http://recipe:8080
     ports:
-      - "5000:8080" 
+      - "5173:8080"
     networks:
       - foodsense
     depends_on:
@@ -92,8 +95,8 @@ services:
     build:
       context: src/Frontend/ReactWeb
       dockerfile: Dockerfile
-    environment:
-      VITE_API_URL: http://localhost:5000   
+      args:
+        VITE_API_BASE_URL: http://localhost:5173/api
     ports:
       - "3000:80"
     networks:
