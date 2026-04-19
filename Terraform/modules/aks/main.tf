@@ -65,7 +65,7 @@ resource "kubernetes_namespace_v1" "app" {
   }
 }
 
-resource "kubernetes_secret" "ghcr_pull_secret" {
+resource "kubernetes_secret_v1" "ghcr_pull_secret" {
   metadata {
     name      = "ghcr-secret"
     namespace = kubernetes_namespace_v1.app.metadata[0].name
