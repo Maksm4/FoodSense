@@ -16,6 +16,7 @@ jobs:
   terraform:
     name: Terraform
     runs-on: ubuntu-24.04
+    environment: ${{ github.ref == 'refs/heads/prod' && 'production' || 'development' }}
 
     env:
       TF_TOKEN_app_terraform_io: ${{ secrets.TF_API_TOKEN }}
