@@ -35,7 +35,7 @@ jobs:
   build-and-test:
     runs-on: ubuntu-24.04
     permissions: 
-      contents: read
+      contents: write
       packages: write
     steps:
       - name: Checkout code
@@ -70,3 +70,12 @@ jobs:
           file: ${{ inputs.dockerfile }}
           push: ${{ inputs.push }}
           tags: ghcr.io/${{ env.REPO }}/${{ inputs.service }}:${{ github.sha }}
+
+      - name: Update kustomize image tag
+        if: ${{ inputs.push }}
+        run: |
+          chmod +x .github/scripts/update-image-tag.sh
+          .github/scripts/update-image-tag.sh \
+            "${{ inputs.service }}" \
+            "ghcr.io/${{ env.REPO }}/${{ inputs.service }}" \
+            "${{ github.sha }}"

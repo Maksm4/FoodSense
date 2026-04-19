@@ -2,10 +2,13 @@ name: Recipe CI
 
 on:
   pull_request: 
-    branches: [ "dev" ]
+    branches: [ "dev", "prod" ]
     paths: [ 'src/Services/Recipe/**', 'src/Common/**' ]
-  push: 
-    branches: [ "dev" ]
+  push:
+    branches:
+      - dev
+      - prod
+      - 'feature/**'
     paths: [ 'src/Services/Recipe/**', 'src/Common/**' ]
 
 jobs:
@@ -15,4 +18,4 @@ jobs:
       service: 'recipe'
       project_path: 'src/Services/Recipe/Recipe.sln'
       dockerfile: 'src/Services/Recipe/Recipe.API/Dockerfile'
-      push: ${{ github.event_name == 'push' }}
+      push: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod' }}

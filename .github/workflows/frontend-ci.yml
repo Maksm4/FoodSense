@@ -2,11 +2,14 @@ name: Frontend CI
 
 on:
   pull_request:
-    branches: [ "dev" ]
+    branches: [ "dev" , "prod"]
     paths: [ 'src/Frontend/**' ]
   push:
-    branches: [ "dev" ]
-    paths: [ 'src/Frontend/**' ]
+    branches:
+      - dev
+      - prod
+      - 'feature/**'
+    paths: ['src/Frontend/**']
 
 jobs:
   build-frontend:
@@ -25,7 +28,7 @@ jobs:
         run: echo "REPO=${GITHUB_REPOSITORY,,}" >> $GITHUB_ENV
 
       - name: Login to GHCR
-        if: ${{ github.event_name == 'push' }}
+        if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod'
         uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -37,5 +40,14 @@ jobs:
         with:
           context: src/Frontend
           file: src/Frontend/Dockerfile
-          push: ${{ github.event_name == 'push' }}
+          push: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod' }}
           tags: ghcr.io/${{ env.REPO }}/react-frontend:${{ github.sha }}
+
+      - name: Update kustomize image tag
+        if: github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod'
+        run: |
+          chmod +x .github/scripts/update-image-tag.sh
+          .github/scripts/update-image-tag.sh \
+            "react-frontend" \
+            "ghcr.io/${{ env.REPO }}/react-frontend" \
+            "${{ github.sha }}"
