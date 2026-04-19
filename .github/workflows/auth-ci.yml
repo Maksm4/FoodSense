@@ -2,10 +2,13 @@ name: Auth CI
 
 on:
   pull_request: 
-    branches: [ "dev" ]
+    branches: [ "dev", "prod" ]
     paths: [ 'src/Services/Auth/**', 'src/Common/**' ]
-  push: 
-    branches: [ "dev" ]
+  push:
+    branches:
+      - dev
+      - prod
+      - 'feature/**'
     paths: [ 'src/Services/Auth/**', 'src/Common/**' ]
 
 jobs:
@@ -15,4 +18,4 @@ jobs:
       service: 'auth'
       project_path: 'src/Services/Auth/Auth.sln'
       dockerfile: 'src/Services/Auth/Auth.API/Dockerfile'
-      push: ${{ github.event_name == 'push' }}
+      push: ${{ github.ref == 'refs/heads/dev' || github.ref == 'refs/heads/prod' }}

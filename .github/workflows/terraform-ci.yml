@@ -46,7 +46,7 @@ jobs:
 
       - name: Terraform plan
         id: plan
-        run: terraform plan -no-color
+        run: terraform plan -no-color -out=tfplan
         working-directory: Terraform
 
       - name: Show plan on PR
